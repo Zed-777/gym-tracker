@@ -342,8 +342,31 @@
 
 <div id="toast-container" class="toast-container"></div>
 
-<!-- Load credentials from Cloudflare Function -->
-<script src="/api/env"></script>
+<!-- Initialize environment variables -->
+<script>
+// Initialize __ENV object (will be overwritten by /api/env if available)
+if (!window.__ENV) {
+  window.__ENV = {
+    SUPABASE_URL: '',
+    SUPABASE_KEY: ''
+  };
+}
+</script>
+
+<!-- Try to load credentials from Cloudflare Function (non-blocking) -->
+<script>
+(async () => {
+  try {
+    const response = await fetch('/api/env');
+    if (response.ok) {
+      const script = await response.text();
+      eval(script);
+    }
+  } catch(e) {
+    console.warn('Env function not available. Check Cloudflare deployment.');
+  }
+})();
+</script>
 
 <script>
 // ─── MODULES ─────────────────────────────────────────────────────────────────
