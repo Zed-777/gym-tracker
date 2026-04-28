@@ -378,10 +378,11 @@ const SB_KEY = window.__ENV?.SUPABASE_KEY || '';
 const DB = {
   async get(id) {
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
-    const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}&select=data`;
+    const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}&select=*`;
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${SB_KEY}` } });
-    const data = await res.json();
-    return data[0]?.data || null;
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    const rows = await res.json();
+    return rows?.[0]?.data || null;
   },
 
   async set(id, data) {

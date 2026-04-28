@@ -26,22 +26,29 @@
 3. Copy and paste this SQL:
 
 ```sql
+-- Drop table if exists (for clean setup)
+DROP TABLE IF EXISTS gym_data CASCADE;
+
+-- Create table
 CREATE TABLE gym_data (
   id TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
+  data JSONB NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Enable RLS
 ALTER TABLE gym_data ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "allow all" ON gym_data
+-- Create VERY PERMISSIVE policy (FOR ANON KEY - local testing)
+CREATE POLICY "Allow anon public access" ON gym_data
   FOR ALL 
   USING (true) 
   WITH CHECK (true);
 
-CREATE INDEX idx_gym_data_id ON gym_data(id);
-CREATE INDEX idx_gym_data_created ON gym_data(created_at);
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_gym_data_id ON gym_data(id);
+CREATE INDEX IF NOT EXISTS idx_gym_data_created ON gym_data(created_at DESC);
 ```
 
 4. Click **"Run"** (or Ctrl+Enter)
