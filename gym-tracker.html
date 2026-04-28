@@ -963,13 +963,12 @@ function renderToday() {
           <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
             <input type="checkbox" ${ex.completed ? 'checked' : ''} onchange="toggleExerciseComplete(${idx})" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--ac); margin-top: 2px; flex-shrink: 0;">
             <div style="flex: 1;">
-              <div class="exercise-name" style="text-decoration: ${ex.completed ? 'line-through' : 'none'}; color: ${ex.completed ? 'var(--fg2)' : 'var(--fg)'}}>${ex.name}</div>
+              <div class="exercise-name" style="text-decoration: ${ex.completed ? 'line-through' : 'none'}; color: ${ex.completed ? 'var(--fg2)' : 'var(--fg)'}}>${ex.name}${ex.rpe ? ` <span style="color: var(--intensity); font-weight: 600;">RPE ${ex.rpe}</span>` : ''}</div>
               <div class="set-row">
                 ${(ex.sets || []).map(s => `
                   <div class="set-item">
                     <div class="set-label">Set</div>
                     <div style="font-size: 11px; margin-bottom: 2px;">${s.reps}×${s.weight}kg</div>
-                    ${s.rpe ? `<div class="set-label">RPE ${s.rpe}</div>` : ''}
                   </div>
                 `).join('')}
               </div>
