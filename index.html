@@ -729,13 +729,8 @@ async function loadState() {
     if (saved) state = { ...state, ...saved };
     VALID.profile(state.profile);
   } catch (e) {
-    // If credentials not loaded, just use localStorage (demo mode)
-    if (e.message.includes('credentials')) {
-      console.warn('Running in demo mode (Supabase not configured)');
-    } else {
-      console.error('Load error:', e);
-      showToast('Error loading data', 'error');
-    }
+    console.error('Load error:', e);
+    showToast('Failed to load data: ' + e.message, 'error');
   }
 }
 
@@ -745,14 +740,11 @@ async function saveState() {
     showToast('Saved ✓');
   } catch (e) {
     console.error('Save error:', e);
-    if (e.message.includes('credentials')) {
-      // Demo mode - just use localStorage silently
-      localStorage.setItem('gym_state', JSON.stringify(state));
-    } else if (!OFFLINE.isOnline()) {
+    if (!OFFLINE.isOnline()) {
       OFFLINE.queueOperation(() => DB.set('profile', state));
-      showToast('Offline: saved locally');
+      showToast('Offline: saving locally, will sync when online');
     } else {
-      showToast('Error saving', 'error');
+      showToast('Error saving: ' + e.message, 'error');
     }
   }
 }
@@ -1433,17 +1425,38 @@ function exportData() {
   a.click();
 }
 
-function deleteAllData() {
+async function deleteAllData() {
   if (confirm('Delete ALL data? This cannot be undone.')) {
-    state = {
-      profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
-      preferences: { language: 'en', theme: 'dark', units: 'kg' },
-      workouts: {},
-      prs: {},
-      equipment: {}
-    };
-    saveState();
-    render();
+    try {
+      // Delete all keys with gym_data* prefix from Supabase
+      const allKeys = ['profile', 'exercise_history', 'prs', 'workout_templates', 'progress_notes', 'preferences'];
+      for (const key of allKeys) {
+        await DB.delete(key);
+      }
+      
+      // Delete workout_YYYY-MM-DD entries
+      const today = new Date();
+      for (let i = 0; i < 365; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        await DB.delete('workout_' + dateStr);
+      }
+      
+      // Reset local state
+      state = {
+        profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
+        preferences: { language: 'en', theme: 'dark', units: 'kg' },
+        workouts: {},
+        prs: {},
+        equipment: {}
+      };
+      
+      showToast('All data deleted ✓');
+      render();
+    } catch (e) {
+      showToast('Error deleting data: ' + e.message, 'error');
+    }
   }
 }
 
@@ -1735,16 +1748,9 @@ window.addEventListener('beforeunload', () => {
 
 (async () => {
   try {
-    await loadState();
-    updateNav();
-    render();
-  } catch (e) {
-    console.error('Init error:', e);
-    // Still render even if load fails (demo mode)
-    updateNav();
-    render();
-  }
-})();
+    // Check if Supabase credentials are loaded
+    if (!window.__ENV?.SUPABASE_URL || !window.__ENV?.SUPABASE_KEY) {
+      showToast('❌ Supabase credentials not configured. Check Cloudflare environment variables.', 'error');\n      throw new Error('Missing Supabase credentials');\n    }\n    \n    await loadState();\n    updateNav();\n    render();\n    showToast('✓ Connected to Supabase');\n  } catch (e) {\n    console.error('Init error:', e);\n    showToast('Failed to initialize: ' + e.message, 'error');\n  }\n})();
 </script>
 
 </body>
