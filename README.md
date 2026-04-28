@@ -131,7 +131,7 @@ start gym-tracker.html
 
 ### Architecture
 
-```
+```text
 ┌─────────────────────────────────┐
 │   gym-tracker.html (750 lines)  │
 │  ├─ CSS (500 lines)             │
@@ -189,7 +189,7 @@ CREATE TABLE gym_data (
 ### Data Keys Stored
 
 | Key | Example |
-|-----|---------|
+| --- | --- |
 | `profile` | `{name, age, height, weight, goal}` |
 | `workout_YYYY-MM-DD` | `{exercises: [], notes: ""}` |
 | `prs` | `{exercise: {weight, reps, date}}` |
@@ -290,7 +290,7 @@ window.__ENV = {
 
 Add to `.gitignore`:
 
-```
+```text
 config.js
 .env*
 ```
@@ -428,7 +428,7 @@ MIT License - Feel free to use, modify, distribute
 ## Version History
 
 | Version | Date | Notes |
-|---------|------|-------|
+| --- | --- | --- |
 | 1.0.0 | Apr 2026 | MVP Release |
 | 1.1.0 | TBD | Bug fixes + UX improvements |
 | 2.0.0 | TBD | Authentication + social |

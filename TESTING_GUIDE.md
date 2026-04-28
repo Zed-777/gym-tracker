@@ -394,7 +394,7 @@ Run these every release:
 
 ## Test Report Template
 
-```
+```text
 Date: YYYY-MM-DD
 Tester: [Name]
 Browser: [Name + Version]
