@@ -353,10 +353,11 @@ if (!window.__ENV) {
 }
 </script>
 
-<!-- Try to load credentials from Cloudflare Function (non-blocking) -->
+<!-- Load credentials from Cloudflare Function and initialize app -->
 <script>
 (async () => {
   try {
+    // Fetch credentials from /api/env
     const response = await fetch('/api/env');
     if (response.ok) {
       const script = await response.text();
@@ -365,18 +366,23 @@ if (!window.__ENV) {
   } catch(e) {
     console.warn('Env function not available. Check Cloudflare deployment.');
   }
+  
+  // CRITICAL: Wait a tick for window.__ENV to be fully set
+  await new Promise(resolve => setTimeout(resolve, 10));
+  
+  // Now trigger app initialization
+  initializeApp();
 })();
 </script>
 
 <script>
 // ─── MODULES ─────────────────────────────────────────────────────────────────
 
-const SB_URL = window.__ENV?.SUPABASE_URL || '';
-const SB_KEY = window.__ENV?.SUPABASE_KEY || '';
-
 // DB Module - Supabase wrapper
 const DB = {
   async get(id) {
+    const SB_URL = window.__ENV?.SUPABASE_URL;
+    const SB_KEY = window.__ENV?.SUPABASE_KEY;
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
     const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}&select=*`;
     const res = await fetch(url, { headers: { 'apikey': SB_KEY } });
@@ -386,6 +392,8 @@ const DB = {
   },
 
   async set(id, data) {
+    const SB_URL = window.__ENV?.SUPABASE_URL;
+    const SB_KEY = window.__ENV?.SUPABASE_KEY;
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
     const url = `${SB_URL}/rest/v1/gym_data`;
     await fetch(url, {
@@ -400,6 +408,8 @@ const DB = {
   },
 
   async delete(id) {
+    const SB_URL = window.__ENV?.SUPABASE_URL;
+    const SB_KEY = window.__ENV?.SUPABASE_KEY;
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
     const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}`;
     await fetch(url, { method: 'DELETE', headers: { 'apikey': SB_KEY } });
@@ -1744,9 +1754,9 @@ window.addEventListener('beforeunload', () => {
   saveState();
 });
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ─── INIT FUNCTION ───────────────────────────────────────────────────────────
 
-(async () => {
+async function initializeApp() {
   try {
     // Check if Supabase credentials are loaded
     if (!window.__ENV?.SUPABASE_URL || !window.__ENV?.SUPABASE_KEY) {
@@ -1762,7 +1772,7 @@ window.addEventListener('beforeunload', () => {
     console.error('Init error:', e);
     showToast('Failed to initialize: ' + e.message, 'error');
   }
-})();
+}
 </script>
 
 </body>
