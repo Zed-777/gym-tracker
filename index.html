@@ -920,8 +920,8 @@ function renderWorkouts() {
               <div style="font-size: 13px; color: var(--fg2);">${tpl.exercises?.length || 0} exercises</div>
             </div>
             <div style="display: flex; gap: 6px;">
-              <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="startFromTemplate(${idx})">Use</button>
-              ${idx < ironlogTemplates.length ? '' : `<button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="deleteTemplate(${idx})">✕</button>`}
+              <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="startFromTemplate(${JSON.stringify(tpl).replace(/"/g, '&quot;')})">Use</button>
+              ${idx < ironlogTemplates.length ? '' : `<button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="deleteTemplate(${idx - ironlogTemplates.length})">✕</button>`}
             </div>
           </div>
         </div>
@@ -1577,8 +1577,7 @@ function viewWorkoutDetails(date) {
   document.getElementById('main').innerHTML = html;
 }
 
-function startFromTemplate(idx) {
-  const template = (state.workoutTemplates || [])[idx];
+function startFromTemplate(template) {
   if (!template) return;
   
   const today = getToday();
