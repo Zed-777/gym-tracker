@@ -788,10 +788,28 @@ function render() {
 function renderToday() {
   const today = getToday();
   const workout = state.workouts[today] || { exercises: [], notes: '' };
+  
+  // Calculate progress
+  const totalExercises = workout.exercises?.length || 0;
+  const completedExercises = (workout.exercises || []).filter(ex => ex.completed).length;
+  const progressPercent = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
 
   return `
     <div class="fade-in">
       ${!OFFLINE.isOnline() ? '<div class="offline-banner">📡 ' + T('offline') + '</div>' : ''}
+      
+      ${totalExercises > 0 ? `
+        <div class="card" style="margin-bottom: 16px; background: var(--s2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 600; font-size: 14px;">Workout Progress</div>
+            <div style="font-size: 13px; color: var(--ac);">${completedExercises}/${totalExercises}</div>
+          </div>
+          <div style="width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden;">
+            <div style="height: 100%; width: ${progressPercent}%; background: var(--ac); transition: width 0.3s ease;"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--fg2); margin-top: 4px; text-align: center;">${progressPercent}% complete</div>
+        </div>
+      ` : ''}
       
       <div class="stats-grid">
         <div class="stat-card">
@@ -817,18 +835,21 @@ function renderToday() {
       <div class="section-header">Exercises</div>
       ${workout.exercises?.length === 0 ? `<div style="text-align: center; color: var(--fg2); padding: 24px 0;">${T('add_first')}</div>` : ''}
       ${(workout.exercises || []).map((ex, idx) => `
-        <div class="exercise-card">
+        <div class="exercise-card" style="${ex.completed ? 'opacity: 0.6;' : ''}">
           <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div style="flex: 1;">
-              <div class="exercise-name">${ex.name}</div>
-              <div class="set-row">
-                ${(ex.sets || []).map(s => `
-                  <div class="set-item">
-                    <div class="set-label">Set</div>
-                    <div style="font-size: 11px; margin-bottom: 2px;">${s.reps}×${s.weight}kg</div>
-                    ${s.rpe ? `<div class="set-label">RPE ${s.rpe}</div>` : ''}
-                  </div>
-                `).join('')}
+            <div style="flex: 1; display: flex; gap: 10px;">
+              <input type="checkbox" ${ex.completed ? 'checked' : ''} onchange="toggleExerciseComplete(${idx})" style="margin-top: 4px; cursor: pointer; width: 18px; height: 18px;">
+              <div style="flex: 1;">
+                <div class="exercise-name" style="${ex.completed ? 'text-decoration: line-through; color: var(--fg2);' : ''}">${ex.completed ? '✓ ' : ''}${ex.name}</div>
+                <div class="set-row">
+                  ${(ex.sets || []).map(s => `
+                    <div class="set-item">
+                      <div class="set-label">Set</div>
+                      <div style="font-size: 11px; margin-bottom: 2px;">${s.reps}×${s.weight}kg</div>
+                      ${s.rpe ? `<div class="set-label">RPE ${s.rpe}</div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
               </div>
             </div>
             <button class="btn-secondary" onclick="deleteExercise(${idx})" style="padding: 6px 10px; font-size: 12px;">✕</button>
@@ -1435,6 +1456,14 @@ function showAddExerciseForm() {
   } catch (e) {
     showToast(e.message, 'error');
   }
+}
+
+function toggleExerciseComplete(idx) {
+  const today = getToday();
+  if (!state.workouts[today] || !state.workouts[today].exercises[idx]) return;
+  state.workouts[today].exercises[idx].completed = !state.workouts[today].exercises[idx].completed;
+  saveState();
+  render();
 }
 
 function deleteExercise(idx) {
