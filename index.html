@@ -327,16 +327,9 @@
   <div class="logo"><span>💪</span> Gym Tracker</div>
   <div style="display: flex; gap: 6px; align-items: center;">
     <!-- Language Toggle -->
-    <select id="lang-toggle" onchange="changeLanguage(this.value)" style="padding: 6px 8px; font-size: 12px; border-radius: 6px;">
-      <option value="en" selected>EN</option>
-      <option value="es">ES</option>
-    </select>
+    <button id="lang-toggle" class="btn-secondary" onclick="toggleLanguage()" style="padding: 8px 12px; font-size: 13px; border-radius: 8px; font-weight: 600; min-width: 45px;">EN</button>
     <!-- Theme Toggle -->
-    <select id="theme-toggle" onchange="changeTheme(this.value)" style="padding: 6px 8px; font-size: 12px; border-radius: 6px;">
-      <option value="dark" selected>🌙 Dark</option>
-      <option value="light">☀️ Light</option>
-      <option value="pink">💗 Pink</option>
-    </select>
+    <button id="theme-toggle" class="btn-secondary" onclick="toggleTheme()" style="padding: 8px 12px; font-size: 13px; border-radius: 8px; font-weight: 600; min-width: 50px;">🌙</button>
     <button id="btn-settings" class="btn-secondary" onclick="openView('settings')" style="padding: 6px 8px;">⚙️</button>
   </div>
 </div>
@@ -755,15 +748,10 @@ async function loadState() {
     // Apply saved theme
     const savedTheme = state.preferences?.theme || 'dark';
     document.body.className = `theme-${savedTheme}`;
-    if (document.getElementById('theme-toggle')) {
-      document.getElementById('theme-toggle').value = savedTheme;
-    }
+    updateThemeToggleButton();
     
     // Apply saved language
-    const savedLang = state.preferences?.language || 'en';
-    if (document.getElementById('lang-toggle')) {
-      document.getElementById('lang-toggle').value = savedLang;
-    }
+    updateLanguageToggleButton();
   } catch (e) {
     console.error('Load error:', e);
     showToast('Failed to load data: ' + e.message, 'error');
@@ -801,10 +789,8 @@ function render() {
     else if (currentView === 'settings') main.innerHTML = renderSettings();
     
     // Sync header toggles with current state
-    const themeToggle = document.getElementById('theme-toggle');
-    const langToggle = document.getElementById('lang-toggle');
-    if (themeToggle) themeToggle.value = state.preferences?.theme || 'dark';
-    if (langToggle) langToggle.value = state.preferences?.language || 'en';
+    updateThemeToggleButton();
+    updateLanguageToggleButton();
   } catch (e) {
     console.error('Render error:', e);
     main.innerHTML = `
@@ -1467,19 +1453,19 @@ function renderSettings() {
       <div class="card" style="margin-bottom: 16px;">
         <div style="display: grid; gap: 12px;">
           <div>
-            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Theme</label>
-            <select id="theme-select" onchange="changeTheme(this.value)">
-              <option value="dark" ${state.preferences.theme === 'dark' ? 'selected' : ''}>Dark</option>
-              <option value="light" ${state.preferences.theme === 'light' ? 'selected' : ''}>Light</option>
-              <option value="pink" ${state.preferences.theme === 'pink' ? 'selected' : ''}>Pink</option>
-            </select>
+            <label style="display: block; font-size: 13px; margin-bottom: 8px; color: var(--fg2);">Theme</label>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary" style="flex: 1; padding: 10px; background: ${state.preferences.theme === 'dark' ? 'var(--ac)' : 'var(--bg2)'}; color: ${state.preferences.theme === 'dark' ? 'white' : 'var(--fg)'};" onclick="changeTheme('dark')">🌙 Dark</button>
+              <button class="btn-secondary" style="flex: 1; padding: 10px; background: ${state.preferences.theme === 'light' ? 'var(--ac)' : 'var(--bg2)'}; color: ${state.preferences.theme === 'light' ? 'white' : 'var(--fg)'};" onclick="changeTheme('light')">☀️ Light</button>
+              <button class="btn-secondary" style="flex: 1; padding: 10px; background: ${state.preferences.theme === 'pink' ? 'var(--ac)' : 'var(--bg2)'}; color: ${state.preferences.theme === 'pink' ? 'white' : 'var(--fg)'};" onclick="changeTheme('pink')">💗 Pink</button>
+            </div>
           </div>
           <div>
-            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Language</label>
-            <select id="language-select" onchange="changeLanguage(this.value)">
-              <option value="en" ${state.preferences.language === 'en' ? 'selected' : ''}>English</option>
-              <option value="es" ${state.preferences.language === 'es' ? 'selected' : ''}>Español</option>
-            </select>
+            <label style="display: block; font-size: 13px; margin-bottom: 8px; color: var(--fg2);">Language</label>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary" style="flex: 1; padding: 10px; background: ${state.preferences.language === 'en' ? 'var(--ac)' : 'var(--bg2)'}; color: ${state.preferences.language === 'en' ? 'white' : 'var(--fg)'};" onclick="changeLanguage('en')">🇬🇧 English</button>
+              <button class="btn-secondary" style="flex: 1; padding: 10px; background: ${state.preferences.language === 'es' ? 'var(--ac)' : 'var(--bg2)'}; color: ${state.preferences.language === 'es' ? 'white' : 'var(--fg)'};" onclick="changeLanguage('es')">🇪🇸 Español</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1563,28 +1549,67 @@ function saveProfile() {
   }
 }
 
+function toggleTheme() {
+  const themes = ['dark', 'light', 'pink'];
+  const currentTheme = state.preferences.theme || 'dark';
+  const currentIndex = themes.indexOf(currentTheme);
+  const nextTheme = themes[(currentIndex + 1) % themes.length];
+  
+  document.body.className = `theme-${nextTheme}`;
+  state.preferences.theme = nextTheme;
+  updateThemeToggleButton();
+  saveState();
+}
+
+function updateThemeToggleButton() {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  
+  const themeIcons = {
+    'dark': '🌙',
+    'light': '☀️',
+    'pink': '💗'
+  };
+  
+  const currentTheme = state.preferences.theme || 'dark';
+  btn.textContent = themeIcons[currentTheme] || '🌙';
+}
+
+function toggleLanguage() {
+  const languages = ['en', 'es'];
+  const currentLang = state.preferences.language || 'en';
+  const currentIndex = languages.indexOf(currentLang);
+  const nextLang = languages[(currentIndex + 1) % languages.length];
+  
+  state.preferences.language = nextLang;
+  updateLanguageToggleButton();
+  saveState();
+  render();
+}
+
+function updateLanguageToggleButton() {
+  const btn = document.getElementById('lang-toggle');
+  if (!btn) return;
+  
+  const langLabels = {
+    'en': 'EN',
+    'es': 'ES'
+  };
+  
+  const currentLang = state.preferences.language || 'en';
+  btn.textContent = langLabels[currentLang] || 'EN';
+}
+
 function changeTheme(theme) {
   document.body.className = `theme-${theme}`;
   state.preferences.theme = theme;
-  
-  // Update the theme toggle dropdown
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    themeToggle.value = theme;
-  }
-  
+  updateThemeToggleButton();
   saveState();
 }
 
 function changeLanguage(lang) {
   state.preferences.language = lang;
-  
-  // Update the language toggle dropdown
-  const langToggle = document.getElementById('lang-toggle');
-  if (langToggle) {
-    langToggle.value = lang;
-  }
-  
+  updateLanguageToggleButton();
   saveState();
   render();
 }
