@@ -1685,22 +1685,29 @@ function exportData() {
   a.click();
 }
 
-function deleteAllData() {
+async function deleteAllData() {
   if (confirm('Delete ALL data? This cannot be undone.')) {
-    // Clear all existing properties
-    Object.keys(state).forEach(key => delete state[key]);
-    
-    // Reset to defaults
-    Object.assign(state, {
-      profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
-      preferences: { language: 'en', theme: 'dark', units: 'kg' },
-      workouts: {},
-      prs: {},
-      equipment: {}
-    });
-    
-    saveState();
-    render();
+    showToast('Deleting all data...');
+    try {
+      // Clear all existing properties
+      Object.keys(state).forEach(key => delete state[key]);
+      
+      // Reset to defaults
+      Object.assign(state, {
+        profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
+        preferences: { language: 'en', theme: 'dark', units: 'kg' },
+        workouts: {},
+        prs: {},
+        equipment: {}
+      });
+      
+      await saveState();
+      render();
+      showToast('All data deleted ✓');
+    } catch (e) {
+      console.error('Delete error:', e);
+      showToast('Error deleting data', 'error');
+    }
   }
 }
 
