@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Gym Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --ac: #3B82F6;
+      --ac2: #1D4ED8;
+      --bg: #0f172a;
+      --bg2: #1e293b;
+      --fg: #f1f5f9;
+      --fg2: #cbd5e1;
+      --border: #334155;
+      --reps: #8B5CF6;
+      --weight: #F59E0B;
+      --intensity: #EF4444;
+      --volume: #10B981;
+      --time: #3B82F6;
+    }
+
+    body.theme-light {
+      --bg: #f8fafc;
+      --bg2: #f1f5f9;
+      --fg: #0f172a;
+      --fg2: #475569;
+      --border: #cbd5e1;
+    }
+
+    body.theme-pink {
+      --ac: #ec4899;
+      --ac2: #be185d;
+      --bg: #1f1118;
+      --bg2: #291b24;
+      --fg: #fce7f3;
+      --fg2: #f9a8d4;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--ac); border-radius: 3px; }
+
+    button { cursor: pointer; border: none; font-family: inherit; transition: all 0.15s ease; }
+    button:active { transform: scale(0.98); }
+
+    input, select, textarea {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--ac);
+      background-color: var(--bg2);
+    }
+
+    select option { background-color: var(--bg2); }
+
+    .card {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .btn-primary {
+      background-color: var(--ac);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary:hover { background-color: var(--ac2); }
+
+    .btn-secondary {
+      background-color: var(--bg2);
+      color: var(--fg);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .btn-secondary:hover { background-color: var(--border); }
+
+    .badge {
+      display: inline-block;
+      background-color: var(--ac);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      animation: slideIn 0.3s ease;
+      pointer-events: all;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    #header {
+      background-color: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 120px;
+    }
+
+    #nav-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 8px;
+      font-size: 12px;
+      color: var(--fg2);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: var(--ac);
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .logo span {
+      color: var(--ac);
+    }
+
+    .section-header {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg2);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .exercise-card {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--ac);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .exercise-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .set-item {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .set-label {
+      font-size: 10px;
+      color: var(--fg2);
+    }
+
+    .set-value {
+      font-weight: 600;
+      color: var(--ac);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ac);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--fg2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .error-boundary {
+      background-color: var(--bg2);
+      border: 2px solid var(--intensity);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .error-title {
+      color: var(--intensity);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .error-text {
+      font-size: 13px;
+      color: var(--fg2);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .hidden { display: none !important; }
+
+    /* Offline banner */
+    .offline-banner {
+      background-color: var(--intensity);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="theme-dark">
+
+<div id="header">
+  <button id="btn-back" class="btn-secondary hidden" onclick="goBack()">← Back</button>
+  <div class="logo"><span>💪</span> Gym Tracker</div>
+  <button id="btn-settings" class="btn-secondary" onclick="openView('settings')">⚙️</button>
+</div>
+
+<div id="main"></div>
+
+<div id="nav-bottom">
+  <button class="nav-btn active" data-view="today" onclick="openView('today')">📅 Today</button>
+  <button class="nav-btn" data-view="workouts" onclick="openView('workouts')">📋 Workouts</button>
+  <button class="nav-btn" data-view="progress" onclick="openView('progress')">📈 Progress</button>
+  <button class="nav-btn" data-view="analytics" onclick="openView('analytics')">📊 Analytics</button>
+  <button class="nav-btn" data-view="equipment" onclick="openView('equipment')">🛒 Equipment</button>
+  <button class="nav-btn" data-view="notes" onclick="openView('notes')">📝 Notes</button>
+  <button class="nav-btn" data-view="community" onclick="openView('community')">💬 Community</button>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Initialize environment variables -->
+<script>
+// Initialize __ENV object (will be overwritten by /api/env if available)
+if (!window.__ENV) {
+  window.__ENV = {
+    SUPABASE_URL: '',
+    SUPABASE_KEY: ''
+  };
+}
+</script>
+
+<!-- Try to load credentials from Cloudflare Function (non-blocking) -->
+<script>
+(async () => {
+  try {
+    const response = await fetch('/api/env');
+    if (response.ok) {
+      const script = await response.text();
+      eval(script);
+    }
+  } catch(e) {
+    console.warn('Env function not available. Check Cloudflare deployment.');
+  }
+})();
+</script>
+
+<script>
+// ─── MODULES ─────────────────────────────────────────────────────────────────
+
+const SB_URL = window.__ENV?.SUPABASE_URL || '';
+const SB_KEY = window.__ENV?.SUPABASE_KEY || '';
+
+// DB Module - Supabase wrapper
+const DB = {
+  async get(id) {
+    if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
+    const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}&select=data`;
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${SB_KEY}` } });
+    const data = await res.json();
+    return data[0]?.data || null;
+  },
+
+  async set(id, data) {
+    if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
+    const url = `${SB_URL}/rest/v1/gym_data`;
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ id, data, updated_at: new Date().toISOString() })
+    });
+  },
+
+  async delete(id) {
+    if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
+    const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}`;
+    await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${SB_KEY}` } });
+  }
+};
+
+// CALC Module - Workout math
+const CALC = {
+  estimatedOneRM(weight, reps) {
+    // Epley formula
+    return weight * (1 + reps / 30);
+  },
+
+  calculateVolume(sets) {
+    return sets.reduce((sum, s) => sum + (s.reps * s.weight || 0), 0);
+  },
+
+  sessionStats(exercises) {
+    let totalVolume = 0;
+    let totalIntensity = 0;
+    let setCount = 0;
+
+    exercises.forEach(ex => {
+      ex.sets?.forEach(s => {
+        totalVolume += s.reps * s.weight;
+        totalIntensity += s.rpe || 0;
+        setCount++;
+      });
+    });
+
+    return {
+      totalVolume,
+      avgIntensity: setCount > 0 ? (totalIntensity / setCount).toFixed(1) : 0,
+      setCount
+    };
+  }
+};
+
+// EXERCISES Module - 200+ exercise database
+const EXERCISES = [
+  // COMPOUND LIFTS (Barbell)
+  { id: 'bench_press', name: 'Barbell Bench Press', equipment: 'barbell', muscleGroups: ['chest', 'triceps', 'shoulders'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'squat', name: 'Back Squat', equipment: 'barbell', muscleGroups: ['quads', 'glutes', 'hamstrings'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'deadlift', name: 'Deadlift', equipment: 'barbell', muscleGroups: ['back', 'glutes', 'hamstrings', 'quads'], difficulty: 'advanced', rpe: 9 },
+  { id: 'squat_front', name: 'Front Squat', equipment: 'barbell', muscleGroups: ['quads', 'glutes'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'ohp', name: 'Overhead Press', equipment: 'barbell', muscleGroups: ['shoulders', 'triceps', 'chest'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rows_barbell', name: 'Barbell Row', equipment: 'barbell', muscleGroups: ['back', 'biceps', 'shoulders'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'deadlift_sumo', name: 'Sumo Deadlift', equipment: 'barbell', muscleGroups: ['glutes', 'hamstrings', 'quads', 'back'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'bench_incline', name: 'Incline Barbell Bench Press', equipment: 'barbell', muscleGroups: ['chest', 'shoulders', 'triceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'bench_decline', name: 'Decline Barbell Bench Press', equipment: 'barbell', muscleGroups: ['chest', 'triceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rows_pendulum', name: 'Pendulum Row', equipment: 'machine', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  
+  // CHEST
+  { id: 'dumbbell_press', name: 'Dumbbell Bench Press', equipment: 'dumbbell', muscleGroups: ['chest', 'triceps', 'shoulders'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'dumbbell_incline', name: 'Incline Dumbbell Press', equipment: 'dumbbell', muscleGroups: ['chest', 'shoulders', 'triceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'dumbbell_flye', name: 'Dumbbell Flye', equipment: 'dumbbell', muscleGroups: ['chest'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'cable_fly', name: 'Cable Flye', equipment: 'cable', muscleGroups: ['chest'], difficulty: 'beginner', rpe: 5 },
+  { id: 'machine_chest_press', name: 'Machine Chest Press', equipment: 'machine', muscleGroups: ['chest', 'triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'pushups', name: 'Push-ups', equipment: 'bodyweight', muscleGroups: ['chest', 'triceps', 'shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'pushups_decline', name: 'Decline Push-ups', equipment: 'bodyweight', muscleGroups: ['chest', 'shoulders', 'triceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'pushups_wide', name: 'Wide Grip Push-ups', equipment: 'bodyweight', muscleGroups: ['chest'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'pushups_close', name: 'Close Grip Push-ups', equipment: 'bodyweight', muscleGroups: ['triceps', 'chest'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'machine_pec_deck', name: 'Pec Deck Machine', equipment: 'machine', muscleGroups: ['chest'], difficulty: 'beginner', rpe: 5 },
+  
+  // BACK
+  { id: 'pullups', name: 'Pull-ups', equipment: 'bodyweight', muscleGroups: ['back', 'biceps', 'shoulders'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'pullups_wide', name: 'Wide Grip Pull-ups', equipment: 'bodyweight', muscleGroups: ['back', 'lats', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'pullups_narrow', name: 'Close Grip Pull-ups', equipment: 'bodyweight', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'chinups', name: 'Chin-ups', equipment: 'bodyweight', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'lat_pulldown', name: 'Lat Pulldown', equipment: 'machine', muscleGroups: ['back', 'lats', 'biceps'], difficulty: 'beginner', rpe: 6 },
+  { id: 'lat_pulldown_narrow', name: 'Close Grip Lat Pulldown', equipment: 'machine', muscleGroups: ['back', 'biceps'], difficulty: 'beginner', rpe: 6 },
+  { id: 'rows_dumbbells', name: 'Dumbbell Rows', equipment: 'dumbbell', muscleGroups: ['back', 'biceps', 'shoulders'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rows_cable', name: 'Cable Row', equipment: 'cable', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'rows_machine', name: 'Machine Row', equipment: 'machine', muscleGroups: ['back', 'biceps'], difficulty: 'beginner', rpe: 6 },
+  { id: 'rows_seal', name: 'Seal Rows', equipment: 'barbell', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rows_yates', name: 'Yates Row', equipment: 'barbell', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rows_upright', name: 'Upright Row', equipment: 'barbell', muscleGroups: ['shoulders', 'traps', 'back'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'pullover', name: 'Dumbbell Pullover', equipment: 'dumbbell', muscleGroups: ['chest', 'back'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'pullover_machine', name: 'Machine Pullover', equipment: 'machine', muscleGroups: ['chest', 'back'], difficulty: 'beginner', rpe: 5 },
+  { id: 'rows_inverted', name: 'Inverted Rows', equipment: 'bodyweight', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'rows_pendulum', name: 'Pendulum Row', equipment: 'machine', muscleGroups: ['back', 'biceps'], difficulty: 'intermediate', rpe: 7 },
+  
+  // SHOULDERS
+  { id: 'dumbbell_shoulder_press', name: 'Dumbbell Shoulder Press', equipment: 'dumbbell', muscleGroups: ['shoulders', 'triceps'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'lateral_raise', name: 'Lateral Raise', equipment: 'dumbbell', muscleGroups: ['shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'machine_shoulder_press', name: 'Machine Shoulder Press', equipment: 'machine', muscleGroups: ['shoulders', 'triceps'], difficulty: 'beginner', rpe: 6 },
+  { id: 'arnold_press', name: 'Arnold Press', equipment: 'dumbbell', muscleGroups: ['shoulders', 'triceps', 'chest'], difficulty: 'advanced', rpe: 7 },
+  { id: 'front_raise', name: 'Front Raise', equipment: 'dumbbell', muscleGroups: ['shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'rear_delt_fly', name: 'Rear Delt Flye', equipment: 'dumbbell', muscleGroups: ['shoulders', 'back'], difficulty: 'beginner', rpe: 5 },
+  { id: 'shoulder_press_machine', name: 'Shoulder Press Machine', equipment: 'machine', muscleGroups: ['shoulders', 'triceps'], difficulty: 'beginner', rpe: 6 },
+  { id: 'lateral_raise_cable', name: 'Cable Lateral Raise', equipment: 'cable', muscleGroups: ['shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'shrug_barbell', name: 'Barbell Shrug', equipment: 'barbell', muscleGroups: ['traps', 'shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'shrug_dumbbell', name: 'Dumbbell Shrug', equipment: 'dumbbell', muscleGroups: ['traps', 'shoulders'], difficulty: 'beginner', rpe: 5 },
+  
+  // BICEPS
+  { id: 'barbell_curl', name: 'Barbell Curl', equipment: 'barbell', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 6 },
+  { id: 'dumbbell_curl', name: 'Dumbbell Curl', equipment: 'dumbbell', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 6 },
+  { id: 'curl_machine', name: 'Bicep Curl Machine', equipment: 'machine', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 5 },
+  { id: 'curl_cable', name: 'Cable Curl', equipment: 'cable', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 5 },
+  { id: 'curl_hammer', name: 'Hammer Curl', equipment: 'dumbbell', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 5 },
+  { id: 'curl_ez_bar', name: 'EZ Bar Curl', equipment: 'barbell', muscleGroups: ['biceps', 'forearms'], difficulty: 'beginner', rpe: 6 },
+  { id: 'curl_incline', name: 'Incline Dumbbell Curl', equipment: 'dumbbell', muscleGroups: ['biceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'curl_concentration', name: 'Concentration Curl', equipment: 'dumbbell', muscleGroups: ['biceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'curl_preacher', name: 'Preacher Curl', equipment: 'barbell', muscleGroups: ['biceps', 'forearms'], difficulty: 'intermediate', rpe: 6 },
+  
+  // TRICEPS
+  { id: 'dips', name: 'Dips', equipment: 'bodyweight', muscleGroups: ['triceps', 'chest', 'shoulders'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'tricep_extension', name: 'Tricep Extension', equipment: 'dumbbell', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_pushdown', name: 'Tricep Pushdown', equipment: 'cable', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_dips_machine', name: 'Assisted Dips', equipment: 'machine', muscleGroups: ['triceps', 'chest'], difficulty: 'beginner', rpe: 6 },
+  { id: 'skull_crusher', name: 'Skull Crusher', equipment: 'barbell', muscleGroups: ['triceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'skull_crusher_dumbbell', name: 'Dumbbell Skull Crusher', equipment: 'dumbbell', muscleGroups: ['triceps'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'tricep_extension_rope', name: 'Rope Tricep Extension', equipment: 'cable', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_kickback', name: 'Tricep Kickback', equipment: 'dumbbell', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_overhead', name: 'Overhead Tricep Extension', equipment: 'dumbbell', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_bench_press', name: 'Close Grip Bench Press', equipment: 'barbell', muscleGroups: ['triceps', 'chest'], difficulty: 'intermediate', rpe: 7 },
+  
+  // FOREARMS
+  { id: 'wrist_curl', name: 'Wrist Curl', equipment: 'dumbbell', muscleGroups: ['forearms'], difficulty: 'beginner', rpe: 4 },
+  { id: 'reverse_wrist_curl', name: 'Reverse Wrist Curl', equipment: 'dumbbell', muscleGroups: ['forearms'], difficulty: 'beginner', rpe: 4 },
+  { id: 'farmer_carry', name: 'Farmer Carry', equipment: 'dumbbell', muscleGroups: ['forearms', 'back', 'traps'], difficulty: 'beginner', rpe: 4 },
+  { id: 'wrist_curl_barbell', name: 'Barbell Wrist Curl', equipment: 'barbell', muscleGroups: ['forearms'], difficulty: 'beginner', rpe: 4 },
+  
+  // QUADS
+  { id: 'leg_press', name: 'Leg Press', equipment: 'machine', muscleGroups: ['quads', 'glutes', 'hamstrings'], difficulty: 'beginner', rpe: 6 },
+  { id: 'leg_extension', name: 'Leg Extension', equipment: 'machine', muscleGroups: ['quads'], difficulty: 'beginner', rpe: 5 },
+  { id: 'walking_lunges', name: 'Walking Lunges', equipment: 'dumbbell', muscleGroups: ['quads', 'glutes', 'hamstrings'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'dumbbell_lunge', name: 'Dumbbell Lunges', equipment: 'dumbbell', muscleGroups: ['quads', 'glutes'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'barbell_lunge', name: 'Barbell Lunges', equipment: 'barbell', muscleGroups: ['quads', 'glutes'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'goblet_squat', name: 'Goblet Squat', equipment: 'dumbbell', muscleGroups: ['quads', 'glutes'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'hack_squat', name: 'Hack Squat', equipment: 'machine', muscleGroups: ['quads', 'glutes'], difficulty: 'beginner', rpe: 6 },
+  { id: 'leg_press_v', name: 'V-Squat', equipment: 'machine', muscleGroups: ['quads', 'glutes'], difficulty: 'beginner', rpe: 6 },
+  { id: 'sissy_squat', name: 'Sissy Squat', equipment: 'bodyweight', muscleGroups: ['quads'], difficulty: 'advanced', rpe: 7 },
+  { id: 'bulgarian_split_squat', name: 'Bulgarian Split Squat', equipment: 'dumbbell', muscleGroups: ['quads', 'glutes'], difficulty: 'intermediate', rpe: 7 },
+  
+  // HAMSTRINGS
+  { id: 'leg_curl', name: 'Leg Curl', equipment: 'machine', muscleGroups: ['hamstrings'], difficulty: 'beginner', rpe: 5 },
+  { id: 'leg_curl_seated', name: 'Seated Leg Curl', equipment: 'machine', muscleGroups: ['hamstrings'], difficulty: 'beginner', rpe: 5 },
+  { id: 'leg_curl_lying', name: 'Lying Leg Curl', equipment: 'machine', muscleGroups: ['hamstrings'], difficulty: 'beginner', rpe: 5 },
+  { id: 'nordic_curl', name: 'Nordic Curl', equipment: 'bodyweight', muscleGroups: ['hamstrings'], difficulty: 'advanced', rpe: 8 },
+  { id: 'rdl', name: 'Romanian Deadlift', equipment: 'barbell', muscleGroups: ['hamstrings', 'glutes', 'back'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'rdl_dumbbell', name: 'Dumbbell RDL', equipment: 'dumbbell', muscleGroups: ['hamstrings', 'glutes', 'back'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'good_morning', name: 'Good Morning', equipment: 'barbell', muscleGroups: ['hamstrings', 'glutes', 'back'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'glute_ham_raise', name: 'Glute-Ham Raise', equipment: 'machine', muscleGroups: ['hamstrings', 'glutes'], difficulty: 'advanced', rpe: 8 },
+  
+  // GLUTES
+  { id: 'hip_thrust', name: 'Barbell Hip Thrust', equipment: 'barbell', muscleGroups: ['glutes', 'quads', 'hamstrings'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'glute_bridge', name: 'Glute Bridge', equipment: 'bodyweight', muscleGroups: ['glutes', 'hamstrings'], difficulty: 'beginner', rpe: 5 },
+  { id: 'hip_thrust_machine', name: 'Hip Thrust Machine', equipment: 'machine', muscleGroups: ['glutes', 'quads'], difficulty: 'beginner', rpe: 6 },
+  { id: 'cable_kickback', name: 'Cable Kickback', equipment: 'cable', muscleGroups: ['glutes'], difficulty: 'beginner', rpe: 5 },
+  { id: 'machine_abduction', name: 'Hip Abduction Machine', equipment: 'machine', muscleGroups: ['glutes'], difficulty: 'beginner', rpe: 5 },
+  { id: 'donkey_kick', name: 'Donkey Kick', equipment: 'bodyweight', muscleGroups: ['glutes'], difficulty: 'beginner', rpe: 4 },
+  { id: 'single_leg_rdl', name: 'Single Leg RDL', equipment: 'dumbbell', muscleGroups: ['glutes', 'hamstrings'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'single_leg_hip_thrust', name: 'Single Leg Hip Thrust', equipment: 'barbell', muscleGroups: ['glutes'], difficulty: 'intermediate', rpe: 6 },
+  
+  // CALVES
+  { id: 'calf_raise', name: 'Calf Raise', equipment: 'machine', muscleGroups: ['calves'], difficulty: 'beginner', rpe: 5 },
+  { id: 'dumbbell_calf_raise', name: 'Dumbbell Calf Raise', equipment: 'dumbbell', muscleGroups: ['calves'], difficulty: 'beginner', rpe: 5 },
+  { id: 'barbell_calf_raise', name: 'Barbell Calf Raise', equipment: 'barbell', muscleGroups: ['calves'], difficulty: 'beginner', rpe: 5 },
+  { id: 'calf_raise_seated', name: 'Seated Calf Raise', equipment: 'machine', muscleGroups: ['calves'], difficulty: 'beginner', rpe: 5 },
+  { id: 'leg_press_calf', name: 'Leg Press Calf Raise', equipment: 'machine', muscleGroups: ['calves'], difficulty: 'beginner', rpe: 4 },
+  { id: 'jump_rope', name: 'Jump Rope', equipment: 'bodyweight', muscleGroups: ['calves', 'quads'], difficulty: 'intermediate', rpe: 6 },
+  
+  // ABS/CORE
+  { id: 'crunch', name: 'Crunch', equipment: 'bodyweight', muscleGroups: ['abs'], difficulty: 'beginner', rpe: 4 },
+  { id: 'cable_crunch', name: 'Cable Crunch', equipment: 'cable', muscleGroups: ['abs'], difficulty: 'beginner', rpe: 5 },
+  { id: 'machine_crunch', name: 'Machine Crunch', equipment: 'machine', muscleGroups: ['abs'], difficulty: 'beginner', rpe: 4 },
+  { id: 'ab_wheel', name: 'Ab Wheel', equipment: 'bodyweight', muscleGroups: ['abs', 'shoulders'], difficulty: 'advanced', rpe: 7 },
+  { id: 'plank', name: 'Plank', equipment: 'bodyweight', muscleGroups: ['abs', 'shoulders'], difficulty: 'beginner', rpe: 5 },
+  { id: 'hanging_leg_raise', name: 'Hanging Leg Raise', equipment: 'bodyweight', muscleGroups: ['abs', 'hip_flexors'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'cable_woodchop', name: 'Cable Woodchop', equipment: 'cable', muscleGroups: ['abs', 'obliques'], difficulty: 'intermediate', rpe: 5 },
+  { id: 'decline_crunch', name: 'Decline Crunch', equipment: 'machine', muscleGroups: ['abs'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'sit_ups', name: 'Sit-ups', equipment: 'bodyweight', muscleGroups: ['abs'], difficulty: 'beginner', rpe: 5 },
+  { id: 'dead_bug', name: 'Dead Bug', equipment: 'bodyweight', muscleGroups: ['abs', 'core'], difficulty: 'beginner', rpe: 4 },
+  
+  // ADDITIONAL EXERCISES
+  { id: 'face_pull', name: 'Face Pull', equipment: 'cable', muscleGroups: ['shoulders', 'back'], difficulty: 'beginner', rpe: 5 },
+  { id: 'reverse_fly', name: 'Reverse Fly', equipment: 'dumbbell', muscleGroups: ['shoulders', 'back'], difficulty: 'beginner', rpe: 5 },
+  { id: 'cable_reverse_fly', name: 'Cable Reverse Fly', equipment: 'cable', muscleGroups: ['shoulders', 'back'], difficulty: 'beginner', rpe: 5 },
+  { id: 'tricep_bench_dip', name: 'Tricep Bench Dips', equipment: 'bodyweight', muscleGroups: ['triceps', 'shoulders', 'chest'], difficulty: 'beginner', rpe: 5 },
+  { id: 'box_step_up', name: 'Box Step-ups', equipment: 'dumbbell', muscleGroups: ['quads', 'glutes'], difficulty: 'beginner', rpe: 5 },
+  { id: 'sled_push', name: 'Sled Push', equipment: 'machine', muscleGroups: ['quads', 'glutes', 'chest'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'sled_drag', name: 'Sled Drag', equipment: 'machine', muscleGroups: ['hamstrings', 'glutes', 'back'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'battle_rope', name: 'Battle Ropes', equipment: 'bodyweight', muscleGroups: ['shoulders', 'core', 'cardio'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'medicine_ball_slam', name: 'Medicine Ball Slam', equipment: 'bodyweight', muscleGroups: ['abs', 'shoulders', 'back'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'kettlebell_swing', name: 'Kettlebell Swing', equipment: 'kettlebell', muscleGroups: ['glutes', 'hamstrings', 'back', 'core'], difficulty: 'intermediate', rpe: 7 },
+  { id: 'kettlebell_goblet_squat', name: 'Kettlebell Goblet Squat', equipment: 'kettlebell', muscleGroups: ['quads', 'glutes'], difficulty: 'beginner', rpe: 6 },
+  { id: 'kettlebell_clean', name: 'Kettlebell Clean', equipment: 'kettlebell', muscleGroups: ['shoulders', 'back', 'core'], difficulty: 'advanced', rpe: 7 },
+  { id: 'cable_wood_chop', name: 'Cable Wood Chop', equipment: 'cable', muscleGroups: ['obliques', 'abs', 'shoulders'], difficulty: 'intermediate', rpe: 5 },
+  { id: 'landmine_press', name: 'Landmine Press', equipment: 'barbell', muscleGroups: ['shoulders', 'triceps', 'chest'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'band_pull_apart', name: 'Band Pull Apart', equipment: 'bands', muscleGroups: ['shoulders', 'back'], difficulty: 'beginner', rpe: 3 },
+  { id: 'band_lateral_raise', name: 'Band Lateral Raise', equipment: 'bands', muscleGroups: ['shoulders'], difficulty: 'beginner', rpe: 3 },
+  { id: 'band_curl', name: 'Band Curl', equipment: 'bands', muscleGroups: ['biceps'], difficulty: 'beginner', rpe: 3 },
+  { id: 'band_tricep_extension', name: 'Band Tricep Extension', equipment: 'bands', muscleGroups: ['triceps'], difficulty: 'beginner', rpe: 3 },
+  { id: 'band_leg_curl', name: 'Band Leg Curl', equipment: 'bands', muscleGroups: ['hamstrings'], difficulty: 'beginner', rpe: 3 },
+  { id: 'trap_bar_deadlift', name: 'Trap Bar Deadlift', equipment: 'barbell', muscleGroups: ['back', 'glutes', 'quads', 'hamstrings'], difficulty: 'intermediate', rpe: 8 },
+  { id: 'treadmill_running', name: 'Treadmill Running', equipment: 'machine', muscleGroups: ['cardio', 'quads', 'glutes'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'rowing_machine', name: 'Rowing Machine', equipment: 'machine', muscleGroups: ['back', 'biceps', 'core'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'elliptical', name: 'Elliptical', equipment: 'machine', muscleGroups: ['cardio', 'quads', 'glutes'], difficulty: 'beginner', rpe: 5 },
+  { id: 'stair_climber', name: 'Stair Climber', equipment: 'machine', muscleGroups: ['quads', 'glutes', 'cardio'], difficulty: 'intermediate', rpe: 6 },
+  { id: 'assault_bike', name: 'Assault Bike', equipment: 'machine', muscleGroups: ['cardio', 'quads', 'glutes'], difficulty: 'intermediate', rpe: 7 },
+];
+
+// VALID Module - Input validation
+const VALID = {
+  numeric(value, min, max, fieldName) {
+    const num = parseFloat(value);
+    if (isNaN(num)) throw new Error(`${fieldName} must be a number`);
+    if (num < min || num > max) throw new Error(`${fieldName} must be between ${min} and ${max}`);
+    return num;
+  },
+
+  exerciseSet(set) {
+    if (!set.reps || !set.weight) throw new Error('Reps and weight required');
+    this.numeric(set.reps, 1, 100, 'Reps');
+    this.numeric(set.weight, 0.5, 1000, 'Weight');
+    if (set.rpe) this.numeric(set.rpe, 1, 10, 'RPE');
+    return true;
+  },
+
+  profile(p) {
+    if (p.age) this.numeric(p.age, 16, 99, 'Age');
+    if (p.height) this.numeric(p.height, 140, 220, 'Height');
+    if (p.weight) this.numeric(p.weight, 40, 200, 'Weight');
+    return true;
+  }
+};
+
+// OFFLINE Module
+const OFFLINE = {
+  isOnline() { return navigator.onLine; },
+
+  queue: [],
+
+  queueOperation(fn) {
+    this.queue.push(fn);
+  },
+
+  async retryQueue() {
+    const failed = [];
+    for (const fn of this.queue) {
+      try {
+        await fn();
+      } catch (e) {
+        failed.push(fn);
+      }
+    }
+    this.queue = failed;
+  }
+};
+
+// LANG Module - Translations
+const LANG = {
+  en: {
+    today: 'Today', workouts: 'Workouts', progress: 'Progress', analytics: 'Analytics',
+    equipment: 'Equipment', notes: 'Notes', community: 'Community', settings: 'Settings',
+    add_exercise: 'Add Exercise', save: 'Save', cancel: 'Cancel', delete: 'Delete',
+    profile: 'Profile', preferences: 'Preferences', theme: 'Theme', language: 'Language',
+    rest_day: 'Rest Day', no_workouts: 'No workouts today', add_first: 'Add your first exercise!',
+    offline: 'You are offline. Changes will sync when online.',
+    total_volume: 'Total Volume', avg_intensity: 'Avg Intensity', pr: 'Personal Record'
+  },
+  es: {
+    today: 'Hoy', workouts: 'Entrenamientos', progress: 'Progreso', analytics: 'Análisis',
+    equipment: 'Equipo', notes: 'Notas', community: 'Comunidad', settings: 'Configuración',
+    add_exercise: 'Añadir Ejercicio', save: 'Guardar', cancel: 'Cancelar', delete: 'Eliminar',
+    profile: 'Perfil', preferences: 'Preferencias', theme: 'Tema', language: 'Idioma',
+    rest_day: 'Día de Descanso', no_workouts: 'Sin entrenamientos hoy', add_first: '¡Añade tu primer ejercicio!',
+    offline: 'Estás sin conexión. Los cambios se sincronizarán cuando tengas conexión.',
+    total_volume: 'Volumen Total', avg_intensity: 'Intensidad Media', pr: 'Récord Personal'
+  }
+};
+
+function T(key) {
+  const lang = state.preferences?.language || 'en';
+  return LANG[lang]?.[key] || key;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let state = {
+  profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
+  preferences: { language: 'en', theme: 'dark', units: 'kg' },
+  workouts: {},
+  prs: {},
+  equipment: {}
+};
+
+let currentView = 'today';
+let isLoading = false;
+
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+
+function getToday() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function goBack() {
+  openView('today');
+}
+
+function openView(view) {
+  currentView = view;
+  updateNav();
+  render();
+}
+
+function updateNav() {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === currentView);
+  });
+  document.getElementById('btn-back').classList.toggle('hidden', currentView === 'today');
+}
+
+async function loadState() {
+  try {
+    const saved = await DB.get('profile');
+    if (saved) state = { ...state, ...saved };
+    VALID.profile(state.profile);
+  } catch (e) {
+    console.error('Load error:', e);
+    showToast('Error loading data', 'error');
+  }
+}
+
+async function saveState() {
+  try {
+    await DB.set('profile', state);
+    showToast('Saved ✓');
+  } catch (e) {
+    console.error('Save error:', e);
+    if (!OFFLINE.isOnline()) {
+      OFFLINE.queueOperation(() => DB.set('profile', state));
+      showToast('Offline: saved locally');
+    } else {
+      showToast('Error saving', 'error');
+    }
+  }
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+
+function render() {
+  const main = document.getElementById('main');
+  
+  try {
+    if (currentView === 'today') main.innerHTML = renderToday();
+    else if (currentView === 'workouts') main.innerHTML = renderWorkouts();
+    else if (currentView === 'progress') main.innerHTML = renderProgress();
+    else if (currentView === 'analytics') main.innerHTML = renderAnalytics();
+    else if (currentView === 'equipment') main.innerHTML = renderEquipment();
+    else if (currentView === 'notes') main.innerHTML = renderNotes();
+    else if (currentView === 'community') main.innerHTML = renderCommunity();
+    else if (currentView === 'settings') main.innerHTML = renderSettings();
+  } catch (e) {
+    console.error('Render error:', e);
+    main.innerHTML = `
+      <div class="error-boundary fade-in">
+        <div class="error-title">⚠️ Error</div>
+        <div class="error-text">${e.message}</div>
+        <button class="btn-primary" style="margin-top: 12px;" onclick="openView('today')">Back to Home</button>
+      </div>
+    `;
+  }
+}
+
+function renderToday() {
+  const today = getToday();
+  const workout = state.workouts[today] || { exercises: [], notes: '' };
+
+  return `
+    <div class="fade-in">
+      ${!OFFLINE.isOnline() ? '<div class="offline-banner">📡 ' + T('offline') + '</div>' : ''}
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">${workout.exercises?.length || 0}</div>
+          <div class="stat-label">Exercises</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${CALC.calculateVolume(workout.exercises?.flatMap(e => e.sets || []) || []).toFixed(0)}</div>
+          <div class="stat-label">Volume (kg)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${workout.duration || '-'}</div>
+          <div class="stat-label">Minutes</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="font-weight: 600; margin-bottom: 8px;">Workout Notes</div>
+        <textarea placeholder="How did you feel? Energy, mood, notes..." style="min-height: 80px;" id="workout-notes">${workout.notes || ''}</textarea>
+        <button class="btn-primary" style="margin-top: 8px; width: 100%;" onclick="saveWorkoutNotes()">Save Notes</button>
+      </div>
+
+      <div class="section-header">Exercises</div>
+      ${workout.exercises?.length === 0 ? `<div style="text-align: center; color: var(--fg2); padding: 24px 0;">${T('add_first')}</div>` : ''}
+      ${(workout.exercises || []).map((ex, idx) => `
+        <div class="exercise-card">
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+              <div class="exercise-name">${ex.name}</div>
+              <div class="set-row">
+                ${(ex.sets || []).map(s => `
+                  <div class="set-item">
+                    <div class="set-label">Set</div>
+                    <div style="font-size: 11px; margin-bottom: 2px;">${s.reps}×${s.weight}kg</div>
+                    ${s.rpe ? `<div class="set-label">RPE ${s.rpe}</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <button class="btn-secondary" onclick="deleteExercise(${idx})" style="padding: 6px 10px; font-size: 12px;">✕</button>
+          </div>
+        </div>
+      `).join('')}
+
+      <button class="btn-primary" style="width: 100%; margin-top: 16px;" onclick="showAddExerciseForm()">+ Add Exercise</button>
+    </div>
+  `;
+}
+
+function renderWorkouts() {
+  const workoutDates = Object.keys(state.workouts || {}).sort().reverse().slice(0, 14);
+  
+  const historyHtml = workoutDates.length === 0
+    ? '<div style="text-align: center; color: var(--fg2); padding: 24px 0;">No workouts yet</div>'
+    : workoutDates.map(date => {
+        const workout = state.workouts[date];
+        const exCount = workout.exercises?.length || 0;
+        const volume = CALC.calculateVolume(workout.exercises?.flatMap(e => e.sets || []) || []);
+        const dateObj = new Date(date);
+        const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        
+        return `
+          <div class="card" style="margin-bottom: 12px; cursor: pointer;" onclick="viewWorkoutDetails('${date}')">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+              <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">${dateStr}</div>
+                <div style="font-size: 13px; color: var(--fg2);">${exCount} exercises • ${volume.toFixed(0)} kg volume</div>
+              </div>
+              <div style="font-size: 12px; background: var(--bg); padding: 6px 10px; border-radius: 6px;">→</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+  const templatesHtml = (state.workoutTemplates || []).length === 0
+    ? '<div style="text-align: center; color: var(--fg2); padding: 24px 0;">No templates yet</div>'
+    : (state.workoutTemplates || []).map((tpl, idx) => `
+        <div class="card" style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; margin-bottom: 4px;">📌 ${tpl.name}</div>
+              <div style="font-size: 13px; color: var(--fg2);">${tpl.exercises?.length || 0} exercises</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="startFromTemplate(${idx})">Use</button>
+              <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="deleteTemplate(${idx})">✕</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📋 Workouts</div>
+
+      <div class="section-header">Recent Workouts</div>
+      ${historyHtml}
+
+      <div style="margin-top: 20px; margin-bottom: 16px;">
+        <div class="section-header">My Templates</div>
+        ${templatesHtml}
+        <button class="btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveCurrentAsTemplate()">+ Save Current as Template</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderProgress() {
+  // Calculate PRs from all workouts
+  const prs = {};
+  Object.entries(state.workouts || {}).forEach(([date, workout]) => {
+    (workout.exercises || []).forEach(exercise => {
+      if (!exercise.sets || exercise.sets.length === 0) return;
+      
+      const maxSet = exercise.sets.reduce((max, s) => {
+        const weight = s.weight || 0;
+        return weight > (max.weight || 0) ? s : max;
+      }, {});
+      
+      const id = exercise.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      if (!prs[id]) {
+        prs[id] = { 
+          name: exercise.name, 
+          weight: maxSet.weight || 0, 
+          reps: maxSet.reps || 0, 
+          date,
+          history: []
+        };
+      }
+      
+      prs[id].history.push({ date, weight: maxSet.weight, reps: maxSet.reps });
+      
+      if ((maxSet.weight || 0) > prs[id].weight) {
+        prs[id].weight = maxSet.weight;
+        prs[id].reps = maxSet.reps;
+        prs[id].date = date;
+      }
+    });
+  });
+
+  const sortedPRs = Object.values(prs).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+
+  if (sortedPRs.length === 0) {
+    return `
+      <div class="fade-in">
+        <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📈 Progress & PRs</div>
+        <div style="text-align: center; color: var(--fg2); padding: 48px 0;">
+          Log some workouts to see your PRs!
+        </div>
+      </div>
+    `;
+  }
+
+  const prCardsHtml = sortedPRs.slice(0, 10).map((pr, idx) => {
+    const dateObj = new Date(pr.date);
+    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    
+    // Calculate trend (simple: compare with 30 days ago)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const oldestWeight = pr.history
+      .filter(h => new Date(h.date) < thirtyDaysAgo)
+      .sort((a, b) => new Date(a.date) - new Date(b.date))[0]?.weight || pr.weight;
+    
+    const trend = pr.weight - oldestWeight;
+    const trendStr = trend > 0 ? `↑ +${trend.toFixed(1)} kg` : trend < 0 ? `↓ ${trend.toFixed(1)} kg` : '→';
+    const trendColor = trend > 0 ? '--volume' : trend < 0 ? '--intensity' : '--fg2';
+    
+    return `
+      <div class="card" style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: 600;">${pr.name}</div>
+            <div style="font-size: 12px; color: var(--fg2);">PR Date: ${dateStr}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--ac);">${pr.weight.toFixed(1)} kg</div>
+            <div style="font-size: 12px; color: var(${trendColor});">${trendStr}</div>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: var(--fg2);">For ${pr.reps} reps (${CALC.estimatedOneRM(pr.weight, pr.reps).toFixed(1)} kg 1RM)</div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📈 Progress & PRs</div>
+      
+      <div style="padding: 12px; background: var(--bg2); border-left: 3px solid var(--volume); border-radius: 6px; margin-bottom: 16px;">
+        <div style="font-size: 13px; color: var(--fg2);">Total Workouts: <span style="color: var(--ac); font-weight: 600;">${Object.keys(state.workouts || {}).length}</span></div>
+        <div style="font-size: 13px; color: var(--fg2); margin-top: 4px;">Tracked Exercises: <span style="color: var(--ac); font-weight: 600;">${sortedPRs.length}</span></div>
+      </div>
+
+      <div class="section-header">Top Personal Records</div>
+      ${prCardsHtml}
+    </div>
+  `;
+}
+
+function renderAnalytics() {
+  const workoutDates = Object.keys(state.workouts || {}).sort().reverse();
+  const thisWeek = workoutDates.filter(date => {
+    const d = new Date(date);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d >= weekAgo;
+  });
+
+  // Calculate total volume and intensity
+  let totalVolume = 0;
+  let totalIntensity = 0;
+  let totalSets = 0;
+  const muscleGroupVolume = {};
+
+  (state.workouts || {});
+  Object.values(state.workouts || {}).forEach(workout => {
+    (workout.exercises || []).forEach(exercise => {
+      (exercise.sets || []).forEach(set => {
+        totalVolume += (set.reps || 0) * (set.weight || 0);
+        totalIntensity += set.rpe || 0;
+        totalSets++;
+        
+        // Track by muscle groups
+        const exerciseId = exercise.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const ex = EXERCISES.find(e => e.id === exerciseId) || 
+                   EXERCISES.find(e => e.name === exercise.name);
+        
+        if (ex && ex.muscleGroups) {
+          ex.muscleGroups.forEach(mg => {
+            muscleGroupVolume[mg] = (muscleGroupVolume[mg] || 0) + (set.reps * set.weight);
+          });
+        }
+      });
+    });
+  });
+
+  const avgIntensity = totalSets > 0 ? (totalIntensity / totalSets).toFixed(1) : 0;
+
+  // RPE distribution
+  const rpeDistribution = { easy: 0, moderate: 0, hard: 0 };
+  Object.values(state.workouts || {}).forEach(workout => {
+    (workout.exercises || []).forEach(exercise => {
+      (exercise.sets || []).forEach(set => {
+        const rpe = set.rpe || 5;
+        if (rpe <= 5) rpeDistribution.easy++;
+        else if (rpe <= 7) rpeDistribution.moderate++;
+        else rpeDistribution.hard++;
+      });
+    });
+  });
+
+  const sortedMuscles = Object.entries(muscleGroupVolume)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+
+  const totalMuscleVolume = sortedMuscles.reduce((sum, [_, vol]) => sum + vol, 0);
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📊 Analytics</div>
+
+      <div class="stats-grid" style="margin-bottom: 16px;">
+        <div class="stat-card">
+          <div class="stat-value">${totalVolume.toFixed(0)}</div>
+          <div class="stat-label">Total Volume</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgIntensity}</div>
+          <div class="stat-label">Avg RPE</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${thisWeek.length}</div>
+          <div class="stat-label">This Week</div>
+        </div>
+      </div>
+
+      <div class="section-header">Volume by Muscle Group</div>
+      ${sortedMuscles.map(([muscle, volume]) => {
+        const percent = ((volume / totalMuscleVolume) * 100).toFixed(0);
+        const muscleEmoji = {
+          'chest': '🏋️', 'back': '🔙', 'shoulders': '🎯',
+          'biceps': '💪', 'triceps': '💪', 'quads': '🦵',
+          'glutes': '🍑', 'hamstrings': '🦵', 'calves': '📍',
+          'abs': '⚡', 'forearms': '🤝', 'traps': '🏔️',
+          'lats': '🔙', 'cardio': '🏃', 'core': '⚙️',
+          'shoulders': '🎯', 'hip_flexors': '🦵'
+        };
+        
+        return `
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <div style="font-weight: 600;">${muscleEmoji[muscle] || '💪'} ${muscle.charAt(0).toUpperCase() + muscle.slice(1)}</div>
+              <div style="color: var(--ac); font-weight: 600;">${percent}%</div>
+            </div>
+            <div style="height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden;">
+              <div style="height: 100%; background: var(--ac); width: ${percent}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+
+      <div class="section-header" style="margin-top: 20px;">Intensity Distribution</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 24px; font-weight: 700; color: var(--volume);">${rpeDistribution.easy}</div>
+          <div style="font-size: 12px; color: var(--fg2); margin-top: 4px;">Easy (1-5)</div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 24px; font-weight: 700; color: var(--weight);">${rpeDistribution.moderate}</div>
+          <div style="font-size: 12px; color: var(--fg2); margin-top: 4px;">Moderate (6-7)</div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 24px; font-weight: 700; color: var(--intensity);">${rpeDistribution.hard}</div>
+          <div style="font-size: 12px; color: var(--fg2); margin-top: 4px;">Hard (8-10)</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEquipment() {
+  const equipment = state.equipment || {
+    'barbell': { available: true },
+    'dumbbells': { available: true },
+    'cable_machine': { available: true },
+    'leg_press': { available: true },
+    'lat_pulldown': { available: true },
+    'bench': { available: true }
+  };
+
+  const equipmentStatus = Object.entries(equipment || {}).map(([name, status]) => {
+    const available = status.available !== false;
+    const statusColor = available ? 'var(--volume)' : 'var(--intensity)';
+    const statusEmoji = available ? '✓' : '✗';
+    
+    return `
+      <div class="card" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 600;">${name.replace(/_/g, ' ')}</div>
+          <div style="font-size: 12px; color: var(--fg2);">${available ? 'Available' : 'Not available'}</div>
+        </div>
+        <button class="btn-secondary" style="padding: 8px 12px;" onclick="toggleEquipment('${name}')" title="Toggle availability">
+          <span style="color: ${statusColor}; font-weight: 700;">${statusEmoji}</span>
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  // Get alternative exercises for currently unavailable equipment
+  const alternatives = [];
+  Object.entries(equipment || {}).forEach(([name, status]) => {
+    if (status.available === false) {
+      const equipmentExercises = EXERCISES.filter(e => e.equipment === name);
+      equipmentExercises.forEach(ex => {
+        const alts = EXERCISES.filter(a => 
+          a.muscleGroups?.some(m => ex.muscleGroups?.includes(m)) && 
+          a.equipment !== name
+        ).slice(0, 2);
+        
+        if (alts.length > 0) {
+          alternatives.push({
+            need: ex.name,
+            alts: alts.map(a => a.name)
+          });
+        }
+      });
+    }
+  });
+
+  const alternativesHtml = alternatives.length === 0
+    ? '<div style="text-align: center; color: var(--fg2); padding: 12px 0; font-size: 13px;">All equipment available</div>'
+    : alternatives.slice(0, 5).map(alt => `
+        <div class="card" style="margin-bottom: 12px; border-left: 3px solid var(--weight);">
+          <div style="font-weight: 600; margin-bottom: 8px;">Need: ${alt.need}</div>
+          <div style="font-size: 12px; color: var(--fg2);">Alternatives:</div>
+          ${alt.alts.map(a => `<div style="font-size: 13px; margin-top: 4px;">• ${a}</div>`).join('')}
+        </div>
+      `).join('');
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">🛒 Equipment & Setup</div>
+
+      <div class="section-header">Equipment Status</div>
+      ${equipmentStatus}
+      <button class="btn-secondary" style="width: 100%; margin-top: 12px;" onclick="addEquipment()">+ Add Equipment</button>
+
+      <div class="section-header" style="margin-top: 20px;">Alternative Exercises</div>
+      ${alternativesHtml}
+    </div>
+  `;
+}
+
+function renderNotes() {
+  const notes = state.progressNotes || [];
+
+  const formTipsHtml = notes.filter(n => n.type === 'form').map((note, idx) => `
+    <div class="card" style="margin-bottom: 12px; border-left: 3px solid var(--weight);">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600;">${note.exercise}</div>
+          <div style="font-size: 12px; color: var(--fg2); margin-bottom: 8px;">${new Date(note.date).toLocaleDateString()}</div>
+          <div style="font-size: 13px;">${note.text}</div>
+        </div>
+        <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="deleteNote(${idx})">✕</button>
+      </div>
+    </div>
+  `).join('');
+
+  const injuryHtml = notes.filter(n => n.type === 'injury').map((note, idx) => {
+    const severityColor = note.severity >= 7 ? 'var(--intensity)' : note.severity >= 4 ? 'var(--weight)' : 'var(--volume)';
+    
+    return `
+      <div class="card" style="margin-bottom: 12px; border-left: 3px solid ${severityColor};">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="font-weight: 600;">${note.exercise}</div>
+            <div style="font-size: 12px; color: var(--fg2); margin-bottom: 8px;">
+              ${new Date(note.date).toLocaleDateString()} • Severity: ${note.severity}/10
+            </div>
+            <div style="font-size: 13px; margin-bottom: 8px;">${note.text}</div>
+            <div style="font-size: 12px; color: var(--fg2);">Avoid: ${(note.avoidExercises || []).join(', ') || 'None'}</div>
+          </div>
+          <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="deleteNote(${idx})">✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">📝 Form Tips & Notes</div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+        <button class="btn-primary" onclick="addFormTip()" style="width: 100%;">+ Form Tip</button>
+        <button class="btn-primary" onclick="addInjuryNote()" style="width: 100%;">+ Injury Log</button>
+      </div>
+
+      <div class="section-header">Form Cues & Tips</div>
+      ${formTipsHtml || '<div style="text-align: center; color: var(--fg2); padding: 24px 0;">No form tips yet</div>'}
+
+      <div class="section-header" style="margin-top: 20px;">Injury Log</div>
+      ${injuryHtml || '<div style="text-align: center; color: var(--fg2); padding: 24px 0;">No injuries logged</div>'}
+    </div>
+  `;
+}
+
+function renderCommunity() {
+  const popularWorkouts = [
+    { id: 1, name: 'Push/Pull/Legs Split', creator: 'Coach Mike', rating: 4.8, saves: 2340, exercises: ['Bench Press', 'Incline Press', 'Rows', 'Deadlift'] },
+    { id: 2, name: 'Upper/Lower Split', creator: 'Fitness Alex', rating: 4.7, saves: 1890, exercises: ['Bench Press', 'Pull-ups', 'Leg Press', 'Leg Curl'] },
+    { id: 3, name: 'Full Body 3x/week', creator: 'Coach Jay', rating: 4.9, saves: 3120, exercises: ['Squat', 'Bench Press', 'Rows', 'Dips'] },
+    { id: 4, name: 'Leg Day Destroyer', creator: 'Strength_Gains', rating: 4.6, saves: 1650, exercises: ['Back Squat', 'Leg Press', 'Leg Curl', 'Calf Raise'] },
+    { id: 5, name: 'Hypertrophy Focus', creator: 'Natty_Boy', rating: 4.5, saves: 1240, exercises: ['Dumbbell Press', 'Lat Pulldown', 'Leg Extension', 'Cable Flye'] }
+  ];
+
+  const formTips = [
+    { exercise: 'Squat', tip: 'Chest up, knees track over toes, depth matters more than load', author: 'Coach Jay' },
+    { exercise: 'Bench Press', tip: 'Keep shoulders back, full ROM, slight pause at chest', author: 'Strength_Coach' },
+    { exercise: 'Deadlift', tip: 'Hips high initially, neutral spine, bar stays close to body', author: 'Coach Mike' },
+    { exercise: 'Pull-ups', tip: 'Depress shoulders first, chest to bar, full stretch at bottom', author: 'Fitness_Expert' }
+  ];
+
+  const workoutsHtml = popularWorkouts.map(w => `
+    <div class="card" style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600; margin-bottom: 4px;">💪 ${w.name}</div>
+          <div style="font-size: 12px; color: var(--fg2); margin-bottom: 8px;">by ${w.creator}</div>
+          <div style="font-size: 13px; margin-bottom: 8px;">${w.exercises.join(' • ')}</div>
+          <div style="font-size: 11px; color: var(--fg2);">⭐ ${w.rating} • 💾 ${w.saves}</div>
+        </div>
+        <button class="btn-primary" style="padding: 8px 12px; font-size: 12px;" onclick="cloneWorkout(${w.id})">Clone</button>
+      </div>
+    </div>
+  `).join('');
+
+  const tipsHtml = formTips.map(tip => `
+    <div class="card" style="margin-bottom: 12px;">
+      <div style="font-weight: 600; margin-bottom: 8px;">${tip.exercise}</div>
+      <div style="font-size: 13px; margin-bottom: 8px;">"${tip.tip}"</div>
+      <div style="font-size: 11px; color: var(--fg2);">— ${tip.author}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">💬 Community</div>
+
+      <div class="section-header">Popular Workouts</div>
+      ${workoutsHtml}
+
+      <div class="section-header" style="margin-top: 20px;">Form Tips from the Community</div>
+      ${tipsHtml}
+
+      <div style="text-align: center; margin-top: 20px; padding: 16px; background: var(--bg2); border-radius: 8px;">
+        <div style="font-size: 13px; color: var(--fg2); margin-bottom: 8px;">Want to share your workout or tips?</div>
+        <button class="btn-secondary" style="width: 100%;">Submit Workout/Tip</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSettings() {
+  return `
+    <div class="fade-in">
+      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">⚙️ Settings</div>
+
+      <div class="section-header">Profile</div>
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="display: grid; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Name</label>
+            <input type="text" value="${state.profile.name}" id="profile-name" placeholder="Your name">
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Age</label>
+            <input type="number" value="${state.profile.age}" id="profile-age" placeholder="Age">
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Weight (kg)</label>
+            <input type="number" value="${state.profile.weight}" id="profile-weight" placeholder="Weight">
+          </div>
+          <button class="btn-primary" style="width: 100%;" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+
+      <div class="section-header">Preferences</div>
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="display: grid; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Theme</label>
+            <select id="theme-select" onchange="changeTheme(this.value)">
+              <option value="dark" ${state.preferences.theme === 'dark' ? 'selected' : ''}>Dark</option>
+              <option value="light" ${state.preferences.theme === 'light' ? 'selected' : ''}>Light</option>
+              <option value="pink" ${state.preferences.theme === 'pink' ? 'selected' : ''}>Pink</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 13px; margin-bottom: 4px; color: var(--fg2);">Language</label>
+            <select id="language-select" onchange="changeLanguage(this.value)">
+              <option value="en" ${state.preferences.language === 'en' ? 'selected' : ''}>English</option>
+              <option value="es" ${state.preferences.language === 'es' ? 'selected' : ''}>Español</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">Data</div>
+      <div class="card">
+        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="exportData()">📥 Export Data</button>
+        <button class="btn-secondary" style="width: 100%;" onclick="deleteAllData()">🗑️ Delete All Data</button>
+      </div>
+    </div>
+  `;
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+
+function showAddExerciseForm() {
+  const exerciseName = prompt('Exercise name:');
+  if (!exerciseName) return;
+
+  const reps = prompt('Reps per set:');
+  const weight = prompt('Weight (kg):');
+  
+  if (!reps || !weight) {
+    showToast('Cancelled', 'info');
+    return;
+  }
+
+  try {
+    VALID.numeric(reps, 1, 100, 'Reps');
+    VALID.numeric(weight, 0.5, 1000, 'Weight');
+
+    const today = getToday();
+    if (!state.workouts[today]) state.workouts[today] = { exercises: [], notes: '' };
+
+    const sets = parseInt(prompt('Number of sets:') || '3');
+    
+    state.workouts[today].exercises.push({
+      name: exerciseName,
+      sets: Array(sets).fill(null).map(() => ({ reps: parseInt(reps), weight: parseFloat(weight), rpe: 6 }))
+    });
+
+    saveState();
+    render();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function deleteExercise(idx) {
+  const today = getToday();
+  state.workouts[today].exercises.splice(idx, 1);
+  saveState();
+  render();
+}
+
+function saveWorkoutNotes() {
+  const today = getToday();
+  if (!state.workouts[today]) state.workouts[today] = { exercises: [], notes: '' };
+  state.workouts[today].notes = document.getElementById('workout-notes').value;
+  saveState();
+}
+
+function saveProfile() {
+  try {
+    state.profile.name = document.getElementById('profile-name').value;
+    state.profile.age = parseInt(document.getElementById('profile-age').value);
+    state.profile.weight = parseFloat(document.getElementById('profile-weight').value);
+    
+    VALID.profile(state.profile);
+    saveState();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function changeTheme(theme) {
+  document.body.className = `theme-${theme}`;
+  state.preferences.theme = theme;
+  saveState();
+}
+
+function changeLanguage(lang) {
+  state.preferences.language = lang;
+  saveState();
+  render();
+}
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'gym-tracker-data.json';
+  a.click();
+}
+
+function deleteAllData() {
+  if (confirm('Delete ALL data? This cannot be undone.')) {
+    state = {
+      profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
+      preferences: { language: 'en', theme: 'dark', units: 'kg' },
+      workouts: {},
+      prs: {},
+      equipment: {}
+    };
+    saveState();
+    render();
+  }
+}
+
+// ─── WORKOUTS ACTIONS ────────────────────────────────────────────────────────
+
+function viewWorkoutDetails(date) {
+  const workout = state.workouts[date];
+  if (!workout) return;
+  
+  const dateObj = new Date(date);
+  const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  
+  const stats = CALC.sessionStats(workout.exercises || []);
+  
+  let html = `
+    <div class="fade-in">
+      <button class="btn-secondary" onclick="openView('workouts')" style="margin-bottom: 16px;">← Back to Workouts</button>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">${dateStr}</div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">${stats.setCount}</div>
+          <div class="stat-label">Sets</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.totalVolume.toFixed(0)}</div>
+          <div class="stat-label">Volume (kg)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.avgIntensity}</div>
+          <div class="stat-label">Avg RPE</div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 16px; padding: 12px; background: var(--bg2); border-radius: 8px; border-left: 3px solid var(--ac);">
+        <div style="font-size: 13px; color: var(--fg2);">${workout.notes || 'No notes'}</div>
+      </div>
+      
+      <div class="section-header">Exercises</div>
+      ${(workout.exercises || []).map((ex, idx) => `
+        <div class="exercise-card">
+          <div class="exercise-name">${ex.name}</div>
+          <div class="set-row">
+            ${(ex.sets || []).map(s => `
+              <div class="set-item">
+                <div class="set-label">Set</div>
+                <div style="font-size: 11px; margin-bottom: 2px;">${s.reps}×${s.weight}kg</div>
+                ${s.rpe ? `<div class="set-label">RPE ${s.rpe}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  
+  document.getElementById('main').innerHTML = html;
+}
+
+function startFromTemplate(idx) {
+  const template = (state.workoutTemplates || [])[idx];
+  if (!template) return;
+  
+  const today = getToday();
+  state.workouts[today] = { 
+    exercises: JSON.parse(JSON.stringify(template.exercises || [])), 
+    notes: '' 
+  };
+  saveState();
+  openView('today');
+  showToast(`Started workout: ${template.name}`);
+}
+
+function deleteTemplate(idx) {
+  if (confirm('Delete this template?')) {
+    state.workoutTemplates = state.workoutTemplates || [];
+    state.workoutTemplates.splice(idx, 1);
+    saveState();
+    render();
+  }
+}
+
+function saveCurrentAsTemplate() {
+  const today = getToday();
+  const workout = state.workouts[today];
+  
+  if (!workout || !workout.exercises || workout.exercises.length === 0) {
+    showToast('No exercises to save', 'error');
+    return;
+  }
+  
+  const name = prompt('Template name:');
+  if (!name) return;
+  
+  state.workoutTemplates = state.workoutTemplates || [];
+  state.workoutTemplates.push({
+    name,
+    exercises: JSON.parse(JSON.stringify(workout.exercises)),
+    createdAt: new Date().toISOString()
+  });
+  
+  saveState();
+  render();
+  showToast('Template saved ✓');
+}
+
+// ─── EQUIPMENT ACTIONS ───────────────────────────────────────────────────────
+
+function toggleEquipment(name) {
+  state.equipment = state.equipment || {};
+  state.equipment[name] = state.equipment[name] || { available: true };
+  state.equipment[name].available = !state.equipment[name].available;
+  saveState();
+  render();
+}
+
+function addEquipment() {
+  const name = prompt('Equipment name:');
+  if (!name) return;
+  
+  state.equipment = state.equipment || {};
+  state.equipment[name.toLowerCase().replace(/[^a-z0-9]/g, '_')] = { available: true };
+  saveState();
+  render();
+}
+
+// ─── NOTES ACTIONS ───────────────────────────────────────────────────────────
+
+function addFormTip() {
+  const exercise = prompt('Exercise name:');
+  if (!exercise) return;
+  
+  const text = prompt('Form tip (e.g., "Keep chest up, bar path is vertical"):');
+  if (!text) return;
+  
+  state.progressNotes = state.progressNotes || [];
+  state.progressNotes.push({
+    type: 'form',
+    exercise,
+    text,
+    date: new Date().toISOString()
+  });
+  
+  saveState();
+  render();
+  showToast('Form tip added ✓');
+}
+
+function addInjuryNote() {
+  const exercise = prompt('Exercise that causes pain:');
+  if (!exercise) return;
+  
+  const text = prompt('Description (e.g., "Shoulder impingement on overhead press"):');
+  if (!text) return;
+  
+  const severity = prompt('Severity (1-10):');
+  if (!severity) return;
+  
+  try {
+    const sev = VALID.numeric(severity, 1, 10, 'Severity');
+    
+    state.progressNotes = state.progressNotes || [];
+    state.progressNotes.push({
+      type: 'injury',
+      exercise,
+      text,
+      severity: sev,
+      date: new Date().toISOString(),
+      avoidExercises: []
+    });
+    
+    saveState();
+    render();
+    showToast('Injury logged ✓');
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function deleteNote(idx) {
+  if (confirm('Delete this note?')) {
+    state.progressNotes = state.progressNotes || [];
+    state.progressNotes.splice(idx, 1);
+    saveState();
+    render();
+  }
+}
+
+// ─── COMMUNITY ACTIONS ───────────────────────────────────────────────────────
+
+function cloneWorkout(workoutId) {
+  const workouts = [
+    { id: 1, name: 'Push/Pull/Legs Split', exercises: [
+      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100, rpe: 8 }, { reps: 5, weight: 100, rpe: 8 }] },
+      { name: 'Incline Barbell Press', sets: [{ reps: 6, weight: 85, rpe: 7 }] }
+    ]},
+    { id: 2, name: 'Upper/Lower Split', exercises: [
+      { name: 'Barbell Bench Press', sets: [{ reps: 8, weight: 95, rpe: 7 }] },
+      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 80, rpe: 6 }] }
+    ]},
+    { id: 3, name: 'Full Body 3x/week', exercises: [
+      { name: 'Back Squat', sets: [{ reps: 5, weight: 120, rpe: 8 }] },
+      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100, rpe: 8 }] },
+      { name: 'Barbell Row', sets: [{ reps: 5, weight: 105, rpe: 8 }] }
+    ]},
+    { id: 4, name: 'Leg Day Destroyer', exercises: [
+      { name: 'Back Squat', sets: [{ reps: 6, weight: 115, rpe: 8 }] },
+      { name: 'Leg Press', sets: [{ reps: 8, weight: 250, rpe: 7 }] }
+    ]},
+    { id: 5, name: 'Hypertrophy Focus', exercises: [
+      { name: 'Dumbbell Bench Press', sets: [{ reps: 8, weight: 45, rpe: 7 }] },
+      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 75, rpe: 6 }] }
+    ]}
+  ];
+  
+  const workout = workouts.find(w => w.id === workoutId);
+  if (!workout) return;
+  
+  const today = getToday();
+  state.workouts[today] = {
+    exercises: JSON.parse(JSON.stringify(workout.exercises)),
+    notes: `Cloned from: ${workout.name}`
+  };
+  
+  saveState();
+  openView('today');
+  showToast(`Started: ${workout.name}`);
+}
+
+// ─── OFFLINE HANDLING ─────────────────────────────────────────────────────────
+
+window.addEventListener('online', () => {
+  showToast('Back online! Syncing...');
+  OFFLINE.retryQueue();
+});
+
+window.addEventListener('offline', () => {
+  showToast('No internet connection');
+});
+
+// ─── MEMORY CLEANUP ──────────────────────────────────────────────────────────
+
+window.addEventListener('beforeunload', () => {
+  saveState();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+(async () => {
+  try {
+    await loadState();
+    updateNav();
+    render();
+  } catch (e) {
+    console.error('Init error:', e);
+    showToast('Failed to load. Check credentials.', 'error');
+  }
+})();
+</script>
+
+</body>
+</html>

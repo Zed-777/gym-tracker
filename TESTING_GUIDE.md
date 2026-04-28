@@ -3,6 +3,7 @@
 ## Quick Start Testing
 
 ### 1. Local Testing Setup
+
 ```bash
 # Ensure you have config.js with credentials
 # Open gym-tracker.html in browser
@@ -16,6 +17,7 @@
 ### ✅ Basic Functionality Tests
 
 #### Test 1: Profile Setup
+
 - [ ] Open app → Settings tab
 - [ ] Enter name, age, weight
 - [ ] Change theme (Dark/Light/Pink)
@@ -27,6 +29,7 @@
 ---
 
 #### Test 2: Add Workout
+
 - [ ] Click "Today" tab
 - [ ] Click "+ Add Exercise"
 - [ ] Enter exercise name: "Bench Press"
@@ -41,6 +44,7 @@
 ---
 
 #### Test 3: Delete Exercise
+
 - [ ] Add an exercise
 - [ ] Click the ✕ button
 - [ ] Verify exercise is removed
@@ -51,6 +55,7 @@
 ---
 
 #### Test 4: View Workouts History
+
 - [ ] Add a workout on Today tab
 - [ ] Go to Workouts tab
 - [ ] Verify today's workout shows in history
@@ -62,6 +67,7 @@
 ---
 
 #### Test 5: Save as Template
+
 - [ ] Add workout with 3-5 exercises
 - [ ] Go to Workouts tab
 - [ ] Click "+ Save Current as Template"
@@ -73,6 +79,7 @@
 ---
 
 #### Test 6: Clone Template
+
 - [ ] Go to Workouts → Templates
 - [ ] Click "Use" button on template
 - [ ] Go to Today tab
@@ -83,6 +90,7 @@
 ---
 
 #### Test 7: Progress & PRs
+
 - [ ] Add several workouts with different weights
 - [ ] Go to Progress tab
 - [ ] Verify PRs are calculated correctly
@@ -94,6 +102,7 @@
 ---
 
 #### Test 8: Analytics
+
 - [ ] Add 5+ workouts with various exercises
 - [ ] Go to Analytics tab
 - [ ] Verify volume calculations
@@ -105,6 +114,7 @@
 ---
 
 #### Test 9: Equipment Tracking
+
 - [ ] Go to Equipment tab
 - [ ] Toggle equipment availability
 - [ ] Click "+ Add Equipment"
@@ -117,6 +127,7 @@
 ---
 
 #### Test 10: Form Tips & Injury Notes
+
 - [ ] Go to Notes tab
 - [ ] Click "+ Form Tip"
 - [ ] Add: Exercise="Squat", Tip="Chest up, depth matters"
@@ -129,6 +140,7 @@
 ---
 
 #### Test 11: Community View
+
 - [ ] Go to Community tab
 - [ ] See popular workouts list
 - [ ] Click "Clone" on a workout
@@ -140,6 +152,7 @@
 ---
 
 #### Test 12: Export Data
+
 - [ ] Go to Settings tab
 - [ ] Click "📥 Export Data"
 - [ ] JSON file downloads: `gym-tracker-data.json`
@@ -152,6 +165,7 @@
 ### 🔌 Offline Mode Tests
 
 #### Test 13: Offline Operation
+
 1. Open DevTools (F12)
 2. Go to **Network** tab
 3. Check **Offline** checkbox
@@ -164,6 +178,7 @@
 ---
 
 #### Test 14: Offline to Online Sync
+
 1. While offline, add 3 exercises
 2. Switch offline mode OFF in DevTools
 3. Watch for "Back online! Syncing..." toast
@@ -175,6 +190,7 @@
 ---
 
 #### Test 15: Offline Banner
+
 1. Go offline
 2. Any view should show offline banner
 3. Go online
@@ -187,6 +203,7 @@
 ### 🗄️ Database Integration Tests
 
 #### Test 16: Data Persistence
+
 1. Add workout with multiple exercises
 2. Note the date and volume
 3. Close browser completely
@@ -200,6 +217,7 @@
 ---
 
 #### Test 17: Multiple Workouts
+
 1. Add 5 workouts on different dates
 2. Go to Workouts tab
 3. Verify all 5 show in history
@@ -212,6 +230,7 @@
 ---
 
 #### Test 18: Large Dataset
+
 1. Simulate adding 30 workouts (or manually add several)
 2. Go to Analytics tab
 3. Verify performance (should load < 1 second)
@@ -225,6 +244,7 @@
 ### 🎨 UI/UX Tests
 
 #### Test 19: Responsive Design
+
 1. Test on mobile device (or DevTools mobile view)
 2. All buttons clickable and appropriately sized
 3. Text readable without zooming
@@ -236,6 +256,7 @@
 ---
 
 #### Test 20: Theme Switching
+
 1. Change to Light theme
 2. Verify all colors readable
 3. Change to Pink theme
@@ -248,6 +269,7 @@
 ---
 
 #### Test 21: Language Switching
+
 1. Switch to Español
 2. UI text changes to Spanish
 3. Add a workout
@@ -261,6 +283,7 @@
 ### ⚠️ Error Handling Tests
 
 #### Test 22: Input Validation
+
 1. Try to add exercise with:
    - Negative reps → Should error
    - Weight > 1000 → Should error
@@ -272,6 +295,7 @@
 ---
 
 #### Test 23: Missing Data Handling
+
 1. Try to save workout with no exercises
 2. Try to save note with empty text
 3. Verify graceful handling
@@ -281,6 +305,7 @@
 ---
 
 #### Test 24: Connection Loss Handling
+
 1. Start a save operation
 2. Disconnect internet
 3. Should queue operation
@@ -293,7 +318,8 @@
 
 ## Performance Tests
 
-#### Test 25: Load Time
+### Test 25: Load Time
+
 - [ ] First load: < 2 seconds
 - [ ] View switching: < 0.5 seconds
 - [ ] Data calculations: instant
@@ -303,6 +329,7 @@
 ---
 
 #### Test 26: Memory Usage
+
 1. Open DevTools → Memory
 2. Take heap snapshot (baseline)
 3. Add 10 workouts
@@ -316,7 +343,8 @@
 
 ## Deployment Tests
 
-#### Test 27: Production Deployment
+### Test 27: Production Deployment
+
 1. Deploy to Cloudflare Pages
 2. Access production URL
 3. Test all features work
@@ -328,6 +356,7 @@
 ---
 
 #### Test 28: Environment Variables
+
 1. Verify SUPABASE_URL in Cloudflare Pages
 2. Verify SUPABASE_KEY set
 3. Test save operation

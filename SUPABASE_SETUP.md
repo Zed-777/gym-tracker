@@ -1,7 +1,8 @@
 # 🔧 Supabase Setup Guide
 
 ## Prerequisites
-- Supabase account (free tier works: https://supabase.com)
+
+- Supabase account (free tier works: <https://supabase.com>)
 - Cloudflare account with Pages project
 - Git repository connected to Cloudflare Pages
 
@@ -9,7 +10,7 @@
 
 ## Step 1: Create Supabase Project
 
-1. Go to https://app.supabase.com
+1. Go to <https://app.supabase.com>
 2. Click "New Project"
 3. Choose organization (or create one)
 4. Enter project name: `gym-tracker`
@@ -51,8 +52,8 @@ CREATE INDEX IF NOT EXISTS idx_gym_data_id ON gym_data(id);
 CREATE INDEX IF NOT EXISTS idx_gym_data_created ON gym_data(created_at DESC);
 ```
 
-4. Click **"Run"** (or Ctrl+Enter)
-5. You should see: `Success. No rows returned`
+1. Click **"Run"** (or Ctrl+Enter)
+2. You should see: `Success. No rows returned`
 
 ---
 
@@ -65,7 +66,8 @@ CREATE INDEX IF NOT EXISTS idx_gym_data_created ON gym_data(created_at DESC);
    - **Anon public key** → Save as `SUPABASE_KEY`
 
 Example:
-```
+
+```text
 SUPABASE_URL: https://xyzabc.supabase.co
 SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
@@ -74,7 +76,7 @@ SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## Step 4: Configure Cloudflare Pages
 
-1. Go to https://dash.cloudflare.com
+1. Go to <https://dash.cloudflare.com>
 2. Navigate to **Pages** → Your project (gym-tracker)
 3. Go to **Settings** → **Environment variables**
 4. Add **Production** environment variables:
@@ -93,7 +95,7 @@ SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 For local development, create `config.js` file (DO NOT COMMIT):
 
-```javascript
+```text
 // config.js - LOCAL DEVELOPMENT ONLY
 // NEVER commit this file to git
 
@@ -104,13 +106,15 @@ window.__ENV = {
 ```
 
 Add to `.gitignore`:
-```
+
+```text
 config.js
 .env.local
 .env
 ```
 
 In `gym-tracker.html`, after the credential loading script:
+
 ```html
 <!-- Cloudflare will inject this on production -->
 <script src="/api/env"></script>
@@ -130,7 +134,7 @@ In `gym-tracker.html`, after the credential loading script:
 
 Open browser console (F12) and run:
 
-```javascript
+```text
 // Test DB connection
 (async () => {
   try {
@@ -170,7 +174,8 @@ In browser console:
 ```
 
 Expected output:
-```
+
+```text
 ✅ Save successful!
 ✅ Load successful! { name: 'Test User', age: 25 }
 ```
@@ -180,6 +185,7 @@ Expected output:
 ## Step 8: Deploy to Production
 
 1. Commit all changes:
+
    ```bash
    git add .
    git commit -m "Add Gym Tracker MVP"
@@ -195,20 +201,24 @@ Expected output:
 ## Troubleshooting
 
 ### "Database credentials not loaded"
+
 - Check Cloudflare environment variables are set correctly
 - Verify `/api/env` endpoint is accessible
 - Check browser console for errors (F12)
 
 ### "401 Unauthorized" errors
+
 - SUPABASE_KEY is wrong or expired
 - Verify API key in Supabase Settings → API
 
 ### Connection timeout
+
 - Check internet connection
 - Verify Supabase project is running (check Dashboard)
 - Try from different network/VPN
 
 ### Data not saving
+
 - Check RLS policy is set correctly (should be "allow all")
 - Verify table name is `gym_data`
 - Check browser console for errors
@@ -243,6 +253,7 @@ SELECT * FROM gym_data ORDER BY created_at DESC;
 ## Next Steps
 
 After setup is complete:
+
 1. ✅ Deploy gym-tracker.html to Cloudflare Pages
 2. ✅ Test all views work on mobile device
 3. ✅ Test offline mode (DevTools → Network → Offline)

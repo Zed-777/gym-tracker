@@ -10,6 +10,7 @@
 ## 🎯 Features
 
 ### Core Features (MVP Complete)
+
 - ✅ **Workout Logging** - Log exercises, sets, reps, weight, and RPE
 - ✅ **Personal Records** - Automatic PR tracking with trends
 - ✅ **Analytics** - Volume, intensity, muscle group breakdowns
@@ -21,7 +22,8 @@
 - ✅ **3 Themes** - Dark, Light, Pink
 - ✅ **Bilingual** - English & Español
 
-### Planned Features (Phase 2+)
+## Planned Features (Phase 2+)
+
 - 📱 Push notifications
 - 🔐 User authentication
 - 📊 Advanced analytics (graphs, trends)
@@ -34,11 +36,14 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Modern web browser (Chrome, Safari, Firefox, Edge)
 - Internet connection (for first load and data sync)
 - [Optional] Supabase account for hosting your own backend
 
 ### Option 1: Local Development (No Backend)
+
+
 ```bash
 # 1. Clone or download the repo
 cd gym-tracker
@@ -52,13 +57,17 @@ start gym-tracker.html
 **Note:** Data will be stored in browser only (localStorage fallback)
 
 ### Option 2: Production (With Supabase)
+
+
 1. Follow [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) to configure backend
 2. Deploy to Cloudflare Pages:
+
    ```bash
    # Connect your repo to Cloudflare Pages
    # Set environment variables (SUPABASE_URL, SUPABASE_KEY)
    # Push to main branch - auto deploys!
    ```
+
 3. Access your app at: `https://your-domain.pages.dev`
 
 ---
@@ -66,12 +75,15 @@ start gym-tracker.html
 ## 📋 How to Use
 
 ### 1. Initial Setup
+
 1. Open app
 2. Go to **Settings** (⚙️)
 3. Enter your profile (name, age, weight)
 4. Choose preferred theme and language
 
 ### 2. Logging a Workout
+
+
 1. Click **Today** tab
 2. Click **"+ Add Exercise"**
 3. Enter:
@@ -83,17 +95,23 @@ start gym-tracker.html
 5. Continue adding exercises
 
 ### 3. Viewing History
+
+
 1. Click **Workouts** tab
 2. See your last 14 workouts
 3. Click a workout to see full details
 
 ### 4. Tracking Progress
+
+
 1. Click **Progress** tab
 2. See your top 10 PRs by weight
 3. View 30-day trends
 4. Check estimated 1RMs
 
 ### 5. Analyzing Data
+
+
 1. Click **Analytics** tab
 2. See total volume and intensity
 3. View breakdown by muscle group
@@ -104,7 +122,7 @@ start gym-tracker.html
 ## 🛠️ Technical Stack
 
 | Component | Technology | Notes |
-|-----------|-----------|-------|
+| --- | --- | --- |
 | **Frontend** | HTML5 + CSS3 + Vanilla JS | Single file SPA, no build step |
 | **Database** | Supabase (PostgreSQL) | REST API, managed |
 | **Hosting** | Cloudflare Pages | Auto-deploy from GitHub |
@@ -158,6 +176,7 @@ start gym-tracker.html
 ## 📊 Database Schema
 
 ### Main Table: `gym_data`
+
 ```sql
 CREATE TABLE gym_data (
   id TEXT PRIMARY KEY,        -- unique identifier
@@ -168,6 +187,7 @@ CREATE TABLE gym_data (
 ```
 
 ### Data Keys Stored
+
 | Key | Example |
 |-----|---------|
 | `profile` | `{name, age, height, weight, goal}` |
@@ -183,6 +203,7 @@ CREATE TABLE gym_data (
 ## 🔐 Security
 
 ### What's Secure ✅
+
 - No credentials in source code
 - Environment variables injected at runtime (Cloudflare Function)
 - Row-Level Security enabled on database
@@ -190,6 +211,7 @@ CREATE TABLE gym_data (
 - XSS prevention through sanitization
 
 ### What's Not (MVP) ⚠️
+
 - No user authentication (all data public)
 - No encryption at rest
 - No rate limiting
@@ -213,6 +235,7 @@ CREATE TABLE gym_data (
 See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for comprehensive testing instructions.
 
 Quick test:
+
 ```javascript
 // In browser console (F12)
 // Test database connection
@@ -229,6 +252,7 @@ Quick test:
 ### To Cloudflare Pages
 
 1. **Create GitHub repo**
+
    ```bash
    git init
    git add .
@@ -237,7 +261,7 @@ Quick test:
    ```
 
 2. **Connect to Cloudflare Pages**
-   - Go to https://dash.cloudflare.com → Pages
+   - Go to <https://dash.cloudflare.com> → Pages
    - "Create a project" → "Connect to Git"
    - Select your repo
    - Deploy settings:
@@ -255,6 +279,7 @@ Quick test:
    - Auto-deploys on git push to main
 
 ### Local Development
+
 ```bash
 # Create config.js (DO NOT COMMIT)
 window.__ENV = {
@@ -264,6 +289,7 @@ window.__ENV = {
 ```
 
 Add to `.gitignore`:
+
 ```
 config.js
 .env*
@@ -284,22 +310,26 @@ config.js
 ## 🐛 Troubleshooting
 
 ### App won't load
+
 - Check internet connection
 - Clear browser cache (Ctrl+Shift+Delete)
 - Check DevTools console for errors (F12)
 
 ### Data not saving
+
 - Verify Supabase credentials in Settings
 - Check Cloudflare Pages environment variables
 - Try offline mode - should queue operations
 
 ### Slow performance
+
 - Clear browser cache
 - Disable browser extensions
 - Try different browser
 - Check network tab in DevTools
 
 ### Offline not working
+
 - Check if OFFLINE module loaded (console: `OFFLINE`)
 - Try going offline with DevTools (F12 → Network → Offline)
 - Data should queue locally
@@ -323,6 +353,7 @@ config.js
 4. Contains all your workouts, PRs, notes, etc.
 
 To restore:
+
 - Keep backup safe
 - [Feature coming] Import button in Settings
 
@@ -345,6 +376,7 @@ Want to improve Gym Tracker?
 ## 📊 Roadmap
 
 ### Phase 1 (Current - MVP) ✅
+
 - [x] Core workout logging
 - [x] PR tracking
 - [x] Analytics
@@ -352,6 +384,7 @@ Want to improve Gym Tracker?
 - [x] Mobile optimization
 
 ### Phase 2 (Future)
+
 - [ ] User authentication
 - [ ] Social features
 - [ ] Advanced analytics (graphs)
@@ -360,6 +393,7 @@ Want to improve Gym Tracker?
 - [ ] Form video analysis
 
 ### Phase 3 (Later)
+
 - [ ] Native iOS app
 - [ ] Native Android app
 - [ ] Wearable integration
@@ -409,7 +443,7 @@ MIT License - Feel free to use, modify, distribute
 
 ## Quick Links
 
-- [📱 Open Gym Tracker](#)
+- [📱 Open Gym Tracker](index.html)
 - [🔧 Setup Supabase](./SUPABASE_SETUP.md)
 - [🧪 Run Tests](./TESTING_GUIDE.md)
 - [📖 Read Spec](./GYM_TRACKER_SPECIFICATION.md)

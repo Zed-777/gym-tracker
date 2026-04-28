@@ -45,7 +45,7 @@ Create a Gym Workout Tracker using the **Diet Tracker as your architectural temp
 
 ### Tech Stack
 
-```
+```text
 gym-tracker.html (single file SPA)
     ├─ CSS (500 lines): responsive, 3 themes, animations
     └─ JavaScript (3500+ lines): 9 modules + 8 views
@@ -71,7 +71,7 @@ gym-tracker.html (single file SPA)
 
 ### Deployment Architecture
 
-```
+```text
 GitHub Repo
     ↓ (push to main)
 Cloudflare Pages
@@ -106,7 +106,7 @@ CREATE POLICY "allow all" ON gym_data
 
 ### Data Keys Stored in gym_data Table
 
-```
+```text
 profile                    → User stats, goals, exp level
 workout_YYYY-MM-DD        → Daily workout logs (exercises, sets)
 exercise_history          → All-time exercise logs
@@ -188,7 +188,7 @@ export async function onRequest(context) {
 
 ### Environment Setup
 
-```
+```text
 Cloudflare Pages Dashboard → Environment Variables:
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -196,7 +196,7 @@ SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### .gitignore
 
-```
+```text
 config.js
 .env.local
 .env
@@ -223,7 +223,7 @@ config.js
 
 ### Navigation (8 Screens, Fixed Bottom Bar)
 
-```
+```text
 🏠 Today     📋 Workouts   📈 Progress  📊 Analytics
 🛒 Equipment 💬 Community  📝 Notes     ⚙️ Settings
 ```
@@ -232,7 +232,7 @@ config.js
 
 **Today (Active Workout):**
 
-```
+```text
 - Session timer (elapsed time)
 - Current exercise with sets logged
 - Completed exercises
@@ -241,7 +241,7 @@ config.js
 
 **Workouts (History & Templates):**
 
-```
+```text
 - Recent workouts (last 30 days)
 - Pre-built templates (PPL, Upper/Lower, Full Body)
 - Custom saved workouts
@@ -250,7 +250,7 @@ config.js
 
 **Progress (PRs & Curves):**
 
-```
+```text
 - Strength curves (line graph: weight over time)
 - Personal records (best lift per exercise)
 - PR date & trend (↑ +X lbs over Y days)
@@ -259,7 +259,7 @@ config.js
 
 **Analytics (Volume, Intensity):**
 
-```
+```text
 - Total volume (weight moved per week)
 - Average intensity (RPE)
 - Volume by muscle group (bar chart)
@@ -268,7 +268,7 @@ config.js
 
 **Equipment (Availability & Alternatives):**
 
-```
+```text
 - Gym equipment status (✓ available, ✗ unavailable)
 - Alternative exercises (when primary unavailable)
 - Home gym checklist
@@ -277,7 +277,7 @@ config.js
 
 **Community (Optional MVP+1):**
 
-```
+```text
 - Popular shared workouts
 - Form tips from community
 - [Preview] [Clone] buttons
@@ -285,7 +285,7 @@ config.js
 
 **Notes (Form & Injury Log):**
 
-```
+```text
 - Form cues per exercise
 - Injury notes with severity
 - Exercises to avoid (when injured)
@@ -294,7 +294,7 @@ config.js
 
 **Settings (Profile & Preferences):**
 
-```
+```text
 - Profile: name, age, height, weight, goal, exp level
 - Display: theme, language, units
 - Notifications: toggles
@@ -602,8 +602,8 @@ try {
 
 ## 📊 COMPARISON: Diet Tracker vs Gym Tracker
 
-| Aspect | Diet Tracker | Gym Tracker |
-|--------|-------------|-----------|
+ | Aspect | Diet Tracker | Gym Tracker |
+ | ------ | ------------ | ----------- |
 | Focus | Nutrition | Workouts |
 | Metrics | Calories, macros | Reps, sets, weight |
 | Main Calc | BMR, TDEE | 1RM, volume, intensity |
@@ -668,7 +668,7 @@ See **GYM_TRACKER_SPECIFICATION.md** for:
 
 ---
 
-## ✨ YOU'RE READY TO BUILD!
+## ✨ YOU'RE READY TO BUILD
 
 This prompt + the GYM_TRACKER_SPECIFICATION.md provide everything needed to build a production-ready app.
 
@@ -683,4 +683,4 @@ This prompt + the GYM_TRACKER_SPECIFICATION.md provide everything needed to buil
 
 ---
 
-**Good luck! You've got this. 🏋️**
+> Good luck! You've got this. 🏋️
