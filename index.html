@@ -728,8 +728,13 @@ async function loadState() {
     if (saved) state = { ...state, ...saved };
     VALID.profile(state.profile);
   } catch (e) {
-    console.error('Load error:', e);
-    showToast('Error loading data', 'error');
+    // If credentials not loaded, just use localStorage (demo mode)
+    if (e.message.includes('credentials')) {
+      console.warn('Running in demo mode (Supabase not configured)');
+    } else {
+      console.error('Load error:', e);
+      showToast('Error loading data', 'error');
+    }
   }
 }
 
@@ -739,7 +744,10 @@ async function saveState() {
     showToast('Saved ✓');
   } catch (e) {
     console.error('Save error:', e);
-    if (!OFFLINE.isOnline()) {
+    if (e.message.includes('credentials')) {
+      // Demo mode - just use localStorage silently
+      localStorage.setItem('gym_state', JSON.stringify(state));
+    } else if (!OFFLINE.isOnline()) {
       OFFLINE.queueOperation(() => DB.set('profile', state));
       showToast('Offline: saved locally');
     } else {
@@ -1731,7 +1739,9 @@ window.addEventListener('beforeunload', () => {
     render();
   } catch (e) {
     console.error('Init error:', e);
-    showToast('Failed to load. Check credentials.', 'error');
+    // Still render even if load fails (demo mode)
+    updateNav();
+    render();
   }
 })();
 </script>
