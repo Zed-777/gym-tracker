@@ -343,7 +343,6 @@
   <button class="nav-btn" data-view="analytics" onclick="openView('analytics')">📊 Analytics</button>
   <button class="nav-btn" data-view="equipment" onclick="openView('equipment')">🛒 Equipment</button>
   <button class="nav-btn" data-view="notes" onclick="openView('notes')">📝 Notes</button>
-  <button class="nav-btn" data-view="community" onclick="openView('community')">💬 Community</button>
 </div>
 
 <div id="toast-container" class="toast-container"></div>
@@ -761,7 +760,6 @@ async function loadState() {
 async function saveState() {
   try {
     await DB.set('profile', state);
-    showToast('Saved ✓');
   } catch (e) {
     console.error('Save error:', e);
     if (!OFFLINE.isOnline()) {
@@ -785,7 +783,6 @@ function render() {
     else if (currentView === 'analytics') main.innerHTML = renderAnalytics();
     else if (currentView === 'equipment') main.innerHTML = renderEquipment();
     else if (currentView === 'notes') main.innerHTML = renderNotes();
-    else if (currentView === 'community') main.innerHTML = renderCommunity();
     else if (currentView === 'settings') main.innerHTML = renderSettings();
     
     // Sync header toggles with current state
@@ -1362,69 +1359,6 @@ function renderNotes() {
   `;
 }
 
-function renderCommunity() {
-  const popularWorkouts = [
-    // IRONLOG Templates
-    { id: 101, name: '🔥 IRONLOG Upper A (Chest+Back)', creator: 'Your Routine', rating: 5.0, saves: 999, exercises: ['Incline Bench Press', 'Barbell Bench Press', 'Barbell Row', 'Lat Pulldown'] },
-    { id: 102, name: '🔥 IRONLOG Leg Day', creator: 'Your Routine', rating: 5.0, saves: 999, exercises: ['Back Squat', 'Leg Press', 'Leg Curl', 'Leg Extension'] },
-    { id: 103, name: '🔥 IRONLOG Shoulders+Arms', creator: 'Your Routine', rating: 5.0, saves: 999, exercises: ['Overhead Press', 'Lateral Raise', 'Barbell Curl', 'Rope Pushdown'] },
-    { id: 104, name: '🔥 IRONLOG Upper B (Chest+Back 2)', creator: 'Your Routine', rating: 5.0, saves: 999, exercises: ['Barbell Bench Press', 'Incline Dumbbell Press', 'Chin-ups', 'Cable Row'] },
-    
-    // Standard Templates
-    { id: 1, name: 'Push/Pull/Legs Split', creator: 'Coach Mike', rating: 4.8, saves: 2340, exercises: ['Bench Press', 'Incline Press', 'Rows', 'Deadlift'] },
-    { id: 2, name: 'Upper/Lower Split', creator: 'Fitness Alex', rating: 4.7, saves: 1890, exercises: ['Bench Press', 'Pull-ups', 'Leg Press', 'Leg Curl'] },
-    { id: 3, name: 'Full Body 3x/week', creator: 'Coach Jay', rating: 4.9, saves: 3120, exercises: ['Squat', 'Bench Press', 'Rows', 'Dips'] },
-    { id: 4, name: 'Leg Day Destroyer', creator: 'Strength_Gains', rating: 4.6, saves: 1650, exercises: ['Back Squat', 'Leg Press', 'Leg Curl', 'Calf Raise'] },
-    { id: 5, name: 'Hypertrophy Focus', creator: 'Natty_Boy', rating: 4.5, saves: 1240, exercises: ['Dumbbell Press', 'Lat Pulldown', 'Leg Extension', 'Cable Flye'] }
-  ];
-
-  const formTips = [
-    { exercise: 'Squat', tip: 'Chest up, knees track over toes, depth matters more than load', author: 'Coach Jay' },
-    { exercise: 'Bench Press', tip: 'Keep shoulders back, full ROM, slight pause at chest', author: 'Strength_Coach' },
-    { exercise: 'Deadlift', tip: 'Hips high initially, neutral spine, bar stays close to body', author: 'Coach Mike' },
-    { exercise: 'Pull-ups', tip: 'Depress shoulders first, chest to bar, full stretch at bottom', author: 'Fitness_Expert' }
-  ];
-
-  const workoutsHtml = popularWorkouts.map(w => `
-    <div class="card" style="margin-bottom: 12px;">
-      <div style="display: flex; justify-content: space-between; align-items: start;">
-        <div style="flex: 1;">
-          <div style="font-weight: 600; margin-bottom: 4px;">💪 ${w.name}</div>
-          <div style="font-size: 12px; color: var(--fg2); margin-bottom: 8px;">by ${w.creator}</div>
-          <div style="font-size: 13px; margin-bottom: 8px;">${w.exercises.join(' • ')}</div>
-          <div style="font-size: 11px; color: var(--fg2);">⭐ ${w.rating} • 💾 ${w.saves}</div>
-        </div>
-        <button class="btn-primary" style="padding: 8px 12px; font-size: 12px;" onclick="cloneWorkout(${w.id})">Clone</button>
-      </div>
-    </div>
-  `).join('');
-
-  const tipsHtml = formTips.map(tip => `
-    <div class="card" style="margin-bottom: 12px;">
-      <div style="font-weight: 600; margin-bottom: 8px;">${tip.exercise}</div>
-      <div style="font-size: 13px; margin-bottom: 8px;">"${tip.tip}"</div>
-      <div style="font-size: 11px; color: var(--fg2);">— ${tip.author}</div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="fade-in">
-      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">💬 Community</div>
-
-      <div class="section-header">Popular Workouts</div>
-      ${workoutsHtml}
-
-      <div class="section-header" style="margin-top: 20px;">Form Tips from the Community</div>
-      ${tipsHtml}
-
-      <div style="text-align: center; margin-top: 20px; padding: 16px; background: var(--bg2); border-radius: 8px;">
-        <div style="font-size: 13px; color: var(--fg2); margin-bottom: 8px;">Want to share your workout or tips?</div>
-        <button class="btn-secondary" style="width: 100%;">Submit Workout/Tip</button>
-      </div>
-    </div>
-  `;
-}
-
 function renderSettings() {
   return `
     <div class="fade-in">
@@ -1908,6 +1842,50 @@ function cloneWorkout(workoutId) {
     { id: 5, name: 'Hypertrophy Focus', exercises: [
       { name: 'Dumbbell Bench Press', sets: [{ reps: 8, weight: 45, rpe: 7 }] },
       { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 75, rpe: 6 }] }
+    ]},
+    
+    // ─── Additional Templates ───────────────────────────────────────────────
+    { id: 6, name: 'Bro Split - Chest Day', exercises: [
+      { name: 'Barbell Bench Press', sets: [{ reps: 6, weight: 100, rpe: 8 }, { reps: 8, weight: 90, rpe: 8 }, { reps: 10, weight: 80, rpe: 7 }] },
+      { name: 'Incline Dumbbell Press', sets: [{ reps: 8, weight: 42, rpe: 7 }, { reps: 8, weight: 42, rpe: 7 }] },
+      { name: 'Chest Flye (Machine)', sets: [{ reps: 10, weight: 80, rpe: 6 }, { reps: 12, weight: 70, rpe: 6 }] },
+      { name: 'Cable Crossover', sets: [{ reps: 12, weight: 50, rpe: 6 }] },
+      { name: 'Push-ups (Weighted)', sets: [{ reps: 10, weight: 20, rpe: 7 }] }
+    ]},
+    { id: 7, name: 'Bro Split - Back Day', exercises: [
+      { name: 'Deadlift', sets: [{ reps: 5, weight: 140, rpe: 9 }, { reps: 5, weight: 140, rpe: 9 }] },
+      { name: 'Barbell Row', sets: [{ reps: 6, weight: 110, rpe: 8 }, { reps: 8, weight: 100, rpe: 8 }] },
+      { name: 'Lat Pulldown (Wide Grip)', sets: [{ reps: 8, weight: 90, rpe: 7 }, { reps: 10, weight: 80, rpe: 7 }] },
+      { name: 'Seal Rows', sets: [{ reps: 10, weight: 95, rpe: 7 }] },
+      { name: 'Face Pulls', sets: [{ reps: 15, weight: 40, rpe: 5 }] }
+    ]},
+    { id: 8, name: 'Strength Focus (Powerlifting)', exercises: [
+      { name: 'Barbell Squat', sets: [{ reps: 3, weight: 130, rpe: 9 }, { reps: 3, weight: 130, rpe: 9 }, { reps: 3, weight: 130, rpe: 9 }] },
+      { name: 'Barbell Bench Press', sets: [{ reps: 3, weight: 105, rpe: 9 }, { reps: 3, weight: 105, rpe: 9 }] },
+      { name: 'Deadlift', sets: [{ reps: 2, weight: 150, rpe: 9 }, { reps: 3, weight: 140, rpe: 8 }] },
+      { name: 'Barbell Row', sets: [{ reps: 5, weight: 110, rpe: 8 }] },
+      { name: 'Bench Press (Paused)', sets: [{ reps: 3, weight: 95, rpe: 8 }] }
+    ]},
+    { id: 9, name: 'High Rep Pump Workout', exercises: [
+      { name: 'Barbell Bench Press', sets: [{ reps: 12, weight: 70, rpe: 7 }, { reps: 12, weight: 70, rpe: 7 }, { reps: 15, weight: 60, rpe: 7 }] },
+      { name: 'Leg Press', sets: [{ reps: 15, weight: 200, rpe: 7 }, { reps: 15, weight: 200, rpe: 7 }, { reps: 20, weight: 180, rpe: 6 }] },
+      { name: 'Lat Pulldown', sets: [{ reps: 12, weight: 75, rpe: 6 }, { reps: 15, weight: 70, rpe: 6 }] },
+      { name: 'Leg Curl', sets: [{ reps: 15, weight: 80, rpe: 6 }, { reps: 15, weight: 80, rpe: 6 }] },
+      { name: 'Cable Flye', sets: [{ reps: 15, weight: 45, rpe: 6 }] }
+    ]},
+    { id: 10, name: 'Bodyweight & Cardio', exercises: [
+      { name: 'Push-ups', sets: [{ reps: 15, weight: 0, rpe: 7 }, { reps: 12, weight: 0, rpe: 6 }, { reps: 10, weight: 0, rpe: 7 }] },
+      { name: 'Chin-ups', sets: [{ reps: 8, weight: 0, rpe: 8 }, { reps: 6, weight: 0, rpe: 8 }] },
+      { name: 'Dips (Machine Assisted)', sets: [{ reps: 10, weight: 60, rpe: 7 }] },
+      { name: 'Walking Lunges', sets: [{ reps: 12, weight: 25, rpe: 6 }] },
+      { name: 'Planks', sets: [{ reps: 1, weight: 0, rpe: 7 }] }
+    ]},
+    { id: 11, name: 'Olympic Lifting Focus', exercises: [
+      { name: 'Power Clean', sets: [{ reps: 3, weight: 80, rpe: 8 }, { reps: 3, weight: 80, rpe: 8 }, { reps: 3, weight: 75, rpe: 8 }] },
+      { name: 'Push Press', sets: [{ reps: 3, weight: 65, rpe: 8 }, { reps: 3, weight: 65, rpe: 8 }] },
+      { name: 'Front Squat', sets: [{ reps: 5, weight: 110, rpe: 8 }] },
+      { name: 'Barbell Row', sets: [{ reps: 5, weight: 105, rpe: 7 }] },
+      { name: 'Back Squat', sets: [{ reps: 3, weight: 125, rpe: 8 }] }
     ]}
   ];
   
