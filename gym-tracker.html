@@ -1687,13 +1687,18 @@ function exportData() {
 
 function deleteAllData() {
   if (confirm('Delete ALL data? This cannot be undone.')) {
-    state = {
+    // Clear all existing properties
+    Object.keys(state).forEach(key => delete state[key]);
+    
+    // Reset to defaults
+    Object.assign(state, {
       profile: { name: 'User', age: 25, height: 180, weight: 80, goal: 'strength', experience: 'intermediate' },
       preferences: { language: 'en', theme: 'dark', units: 'kg' },
       workouts: {},
       prs: {},
       equipment: {}
-    };
+    });
+    
     saveState();
     render();
   }
