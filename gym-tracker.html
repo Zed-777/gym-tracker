@@ -1480,14 +1480,7 @@ function toggleExerciseComplete(idx) {
   // If marking as complete, show RPE input modal
   if (state.workouts[today].exercises[idx].completed) {
     const exName = state.workouts[today].exercises[idx].name;
-    showRPEModal(idx, exName);
-    
-    // Check if all exercises are now complete
-    const totalEx = state.workouts[today].exercises.length;
-    const completedEx = state.workouts[today].exercises.filter(ex => ex.completed).length;
-    if (completedEx === totalEx) {
-      setTimeout(() => showCelebrationModal(), 500);
-    }
+    showRPEModal(idx, exName);  // RPE modal will handle celebration trigger
   } else {
     saveState();
     render();
@@ -1546,6 +1539,16 @@ function setRPEAndClose(exerciseIdx) {
   
   document.querySelector('.modal-overlay').remove();
   saveState();
+  
+  // Check if ALL exercises are now complete (with RPE saved)
+  const totalEx = state.workouts[today].exercises.length;
+  const completedEx = state.workouts[today].exercises.filter(ex => ex.completed).length;
+  
+  if (completedEx === totalEx) {
+    // Show celebration AFTER final RPE is saved
+    showCelebrationModal();
+  }
+  
   render();
 }
 
