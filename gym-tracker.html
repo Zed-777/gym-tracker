@@ -1488,30 +1488,9 @@ function toggleExerciseComplete(idx) {
 }
 
 function showRPEModal(exerciseIdx, exerciseName) {
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = `
-    <div class="modal rpe-modal">
-      <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">How hard was it?</div>
-      <div style="font-size: 13px; color: var(--fg2); margin-bottom: 20px;">Rate your effort (RPE)</div>
-      
-      <div class="rpe-display" id="rpe-display">5</div>
-      <input type="range" id="rpe-slider" class="rpe-slider" min="1" max="10" value="5" oninput="document.getElementById('rpe-display').textContent = this.value;">
-      
-      <div class="rpe-description" id="rpe-description">Moderate effort - could do more</div>
-      
-      <div class="modal-buttons">
-        <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove(); render();" style="background: var(--bg2); color: var(--fg);">Skip</button>
-        <button class="btn-primary" onclick="setRPEAndClose(${exerciseIdx});">✓ Done</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-  
-  // Update description as slider changes
-  const slider = document.getElementById('rpe-slider');
+  // RPE descriptions
   const descriptions = {
+    0: 'No effort - rest',
     1: 'Very easy - warm-up',
     2: 'Easy - felt good',
     3: 'Easy - felt good',
@@ -1524,9 +1503,70 @@ function showRPEModal(exerciseIdx, exerciseName) {
     10: 'Maximum effort - couldn\'t do another'
   };
   
-  slider.addEventListener('input', (e) => {
-    document.getElementById('rpe-description').textContent = descriptions[e.target.value];
+  // Helper to get description for RPE value
+  const getDesc = (rpe) => descriptions[rpe] || 'Rate your effort';
+  
+  // Calculate historical average RPE for this exercise
+  let defaultRPE = 0;
+  let historicalRPEs = [];
+  
+  // Search all past workouts for this exercise name
+  Object.entries(state.workouts || {}).forEach(([date, workout]) => {
+    if (date === getToday()) return; // Skip current workout
+    (workout.exercises || []).forEach(ex => {
+      if (ex.name === exerciseName && ex.rpe) {
+        historicalRPEs.push(ex.rpe);
+      }
+    });
   });
+  
+  // Use average if history exists, otherwise 0
+  if (historicalRPEs.length > 0) {
+    defaultRPE = Math.round(historicalRPEs.reduce((a, b) => a + b, 0) / historicalRPEs.length);
+  }
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal rpe-modal">
+      <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">How hard was it?</div>
+      <div style="font-size: 13px; color: var(--fg2); margin-bottom: 20px;">Rate your effort (RPE)${historicalRPEs.length > 0 ? ` - Avg: ${defaultRPE}` : ''}</div>
+      
+      <div class="rpe-display" id="rpe-display">${defaultRPE}</div>
+      <input type="range" id="rpe-slider" class="rpe-slider" min="0" max="10" value="${defaultRPE}" oninput="document.getElementById('rpe-display').textContent = this.value;">
+      
+      <div class="rpe-description" id="rpe-description">${getDesc(defaultRPE)}</div>
+      
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove(); render();" style="background: var(--bg2); color: var(--fg);">Skip</button>
+        <button class="btn-primary" onclick="setRPEAndClose(${exerciseIdx});">✓ Done</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  
+  // Update description as slider changes
+  const slider = document.getElementById('rpe-slider');
+  slider.addEventListener('input', (e) => {
+    document.getElementById('rpe-description').textContent = getDesc(e.target.value);
+  });
+}
+
+function getDescriptionForRPE(rpe) {
+  const descriptions = {
+    0: 'No effort - rest',
+    1: 'Very easy - warm-up',
+    2: 'Easy - felt good',
+    3: 'Easy - felt good',
+    4: 'Easy - felt good',
+    5: 'Moderate - some effort',
+    6: 'Moderate - some effort',
+    7: 'Hard - pushing it',
+    8: 'Very hard - almost max',
+    9: 'Almost maxed out',
+    10: 'Maximum effort - couldn\'t do another'
+  };
+  return descriptions[rpe] || 'Rate your effort';
 }
 
 function setRPEAndClose(exerciseIdx) {
