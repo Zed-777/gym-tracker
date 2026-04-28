@@ -43,7 +43,6 @@
 
 ### Option 1: Local Development (No Backend)
 
-
 ```bash
 # 1. Clone or download the repo
 cd gym-tracker
@@ -57,7 +56,6 @@ start gym-tracker.html
 **Note:** Data will be stored in browser only (localStorage fallback)
 
 ### Option 2: Production (With Supabase)
-
 
 1. Follow [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) to configure backend
 2. Deploy to Cloudflare Pages:

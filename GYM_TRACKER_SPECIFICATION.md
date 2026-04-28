@@ -8,6 +8,7 @@
 ---
 
 ## 📋 TABLE OF CONTENTS
+
 1. [Executive Summary](#executive-summary)
 2. [Architecture Overview](#architecture-overview)
 3. [Database Schema](#database-schema)
@@ -24,9 +25,11 @@
 ## 🎯 EXECUTIVE SUMMARY
 
 ### Purpose
+
 A single-file mobile-first web app for tracking gym workouts, exercises, progress, and fitness goals with comprehensive analytics and workout history.
 
 ### Key Differentiators from Diet Tracker
+
 - **Focus:** Physical activity & strength training instead of nutrition
 - **Metrics:** Reps, sets, weight, RPE instead of calories & macros
 - **Tracking:** Exercise progression, PR (personal records), form notes
@@ -34,6 +37,7 @@ A single-file mobile-first web app for tracking gym workouts, exercises, progres
 - **Community:** Optional workout templates from community/trainers
 
 ### Constraints (Replicate Diet Tracker Success)
+
 - ✅ Single HTML file with embedded CSS/JavaScript (no build step)
 - ✅ Responsive mobile-first design (tailored for gym use on phones)
 - ✅ Zero hardcoded secrets (Cloudflare Pages Function for credential injection)
@@ -50,6 +54,7 @@ A single-file mobile-first web app for tracking gym workouts, exercises, progres
 ## 🏗️ ARCHITECTURE OVERVIEW
 
 ### High-Level Stack
+
 ```
 ┌────────────────────────────────────────────┐
 │  Single HTML File (gym-tracker.html)       │
@@ -88,6 +93,7 @@ A single-file mobile-first web app for tracking gym workouts, exercises, progres
 ```
 
 ### File Structure
+
 ```
 gym-tracker/ (GitHub repo)
 ├── gym-tracker.html (SINGLE SOURCE OF TRUTH)
@@ -105,6 +111,7 @@ No separate JS/CSS files for production
 ```
 
 ### Deployment
+
 - **Hosting:** Cloudflare Pages (auto-deploy from main branch)
 - **Function:** `functions/api/env.js` - injects Supabase keys at runtime
 - **Database:** Supabase PostgreSQL (managed)
@@ -118,6 +125,7 @@ No separate JS/CSS files for production
 ### Supabase Tables
 
 #### 1. **gym_data** (Main data storage)
+
 ```sql
 CREATE TABLE gym_data (
   id TEXT PRIMARY KEY,              -- e.g., "profile", "workout_2024-04-27", "exercise_log_2024-04-27"
@@ -149,6 +157,7 @@ CREATE POLICY "allow all" ON gym_data
 ## 🔐 SECURITY & CREDENTIALS
 
 ### ❌ NEVER IN CODE
+
 - Supabase API keys (ANON_KEY, SERVICE_KEY)
 - Database passwords
 - JWT tokens
@@ -157,6 +166,7 @@ CREATE POLICY "allow all" ON gym_data
 ### ✅ SOLUTION: Cloudflare Pages Function
 
 **File:** `functions/api/env.js`
+
 ```javascript
 export async function onRequest(context) {
   return new Response(
@@ -174,6 +184,7 @@ export async function onRequest(context) {
 **In HTML:** `<script src="/api/env"></script>` (injected at runtime)
 
 ### Environment Variables Setup
+
 ```bash
 # In Cloudflare Pages dashboard:
 # Settings → Environment Variables
@@ -183,6 +194,7 @@ SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### Local Development
+
 ```bash
 # Create config.js (NOT committed to git)
 window.__ENV = {
@@ -197,6 +209,7 @@ config.js
 ```
 
 ### Row Level Security (RLS)
+
 - Supabase RLS policy: `allow all` (permissive during dev)
 - **Future:** Implement auth-based row-level security when adding user accounts
 
@@ -207,6 +220,7 @@ config.js
 ### Design System (Replicate Diet Tracker)
 
 #### Color Palette
+
 ```css
 /* Dark theme (default) */
 --bg: #0B0F1A           /* Background */
@@ -229,12 +243,14 @@ config.js
 ```
 
 #### Typography
+
 ```css
 --font: 'DM Sans', 'Helvetica Neue', sans-serif
 --disp: 'Barlow Condensed', sans-serif (display headings)
 ```
 
 ### Screen Navigation (8 Views - Bottom Tab Bar)
+
 ```
 ┌─────────────────────────────┐
 │ 🏋️ GYM TRACKER              │
@@ -255,6 +271,7 @@ config.js
 ### View Breakdown
 
 #### 1. **Today** (Active Workout)
+
 ```
 ┌─────────────────────────────┐
 │ Today's Workout - Mon, Apr 27│
@@ -281,6 +298,7 @@ config.js
 ```
 
 #### 2. **Workouts** (History & Templates)
+
 ```
 ┌─────────────────────────────┐
 │ My Workouts                 │
@@ -308,6 +326,7 @@ config.js
 ```
 
 #### 3. **Progress** (Strength Curve & PRs)
+
 ```
 ┌─────────────────────────────┐
 │ Progress & PRs              │
@@ -329,6 +348,7 @@ config.js
 ```
 
 #### 4. **Analytics** (Volume, Intensity)
+
 ```
 ┌─────────────────────────────┐
 │ Weekly Analytics            │
@@ -354,6 +374,7 @@ config.js
 ```
 
 #### 5. **Equipment** (Gym/Home Checklist)
+
 ```
 ┌─────────────────────────────┐
 │ Equipment & Gym Setup       │
@@ -378,6 +399,7 @@ config.js
 ```
 
 #### 6. **Community** (Shared Workouts/Tips)
+
 ```
 ┌─────────────────────────────┐
 │ Community & Tips            │
@@ -403,6 +425,7 @@ config.js
 ```
 
 #### 7. **Notes** (Form Tips, Injury Log)
+
 ```
 ┌─────────────────────────────┐
 │ Form Tips & Notes           │
@@ -432,6 +455,7 @@ config.js
 ```
 
 #### 8. **Settings** (Profile, Preferences)
+
 ```
 ┌─────────────────────────────┐
 │ Settings                    │
@@ -468,6 +492,7 @@ config.js
 ## 🧩 CORE MODULES
 
 ### 1. **DB Module** (Supabase REST Wrapper)
+
 ```javascript
 const DB = {
   async get(id) { /* Fetch data by ID */ },
@@ -479,6 +504,7 @@ const DB = {
 ```
 
 **Data Keys:**
+
 - `profile` - User stats, goals, exp level
 - `workout_YYYY-MM-DD` - Daily logs
 - `exercise_history` - All-time logs
@@ -487,6 +513,7 @@ const DB = {
 - `progress_notes` - Form/injury notes
 
 ### 2. **CALC Module** (Workout Calculations)
+
 ```javascript
 const CALC = {
   // Strength standards by weight class
@@ -510,6 +537,7 @@ const CALC = {
 ```
 
 ### 3. **EXERCISES Module** (Exercise Database)
+
 ```javascript
 const EXERCISES = {
   // 200+ exercises with metadata
@@ -532,6 +560,7 @@ const EXERCISES = {
 ```
 
 ### 4. **WORKOUTS Module** (Workout Templates)
+
 ```javascript
 const WORKOUTS = {
   // Pre-built templates
@@ -554,6 +583,7 @@ const WORKOUTS = {
 ```
 
 ### 5. **PLANS Module** (Smart Planning Engine)
+
 ```javascript
 const PLAN = {
   // Generate next workout based on:
@@ -573,6 +603,7 @@ const PLAN = {
 ```
 
 ### 6. **PROGRESS Module** (Analytics & Tracking)
+
 ```javascript
 const PROGRESS = {
   // Track personal records
@@ -592,6 +623,7 @@ const PROGRESS = {
 ```
 
 ### 7. **LANG Module** (Translations)
+
 ```javascript
 const LANG = {
   en: {
@@ -615,6 +647,7 @@ function T(key) { /* Translate text */ }
 ```
 
 ### 8. **VALID Module** (Validation)
+
 ```javascript
 const VALID = {
   numeric(value, min, max, fieldName) { },
@@ -638,6 +671,7 @@ const VALID = {
 ```
 
 ### 9. **OFFLINE Module** (Offline Detection)
+
 ```javascript
 const OFFLINE = {
   isOnline() { },
@@ -657,6 +691,7 @@ const OFFLINE = {
 ## 📊 DATA MODELS
 
 ### Profile Object
+
 ```javascript
 {
   id: 'profile',
@@ -677,6 +712,7 @@ const OFFLINE = {
 ```
 
 ### Workout Log
+
 ```javascript
 {
   id: 'workout_2024-04-27',
@@ -706,6 +742,7 @@ const OFFLINE = {
 ```
 
 ### Personal Record (PR)
+
 ```javascript
 {
   exerciseId: 'bench_press',
@@ -718,6 +755,7 @@ const OFFLINE = {
 ```
 
 ### Exercise Set
+
 ```javascript
 {
   exerciseId: 'bench_press',
@@ -733,6 +771,7 @@ const OFFLINE = {
 ## 🧠 STATE MANAGEMENT
 
 ### Global State Object
+
 ```javascript
 const S = {
   // Profile
@@ -766,6 +805,7 @@ const S = {
 ```
 
 ### State Persistence
+
 - **Local:** `S` object kept in memory during session
 - **Database:** Changes synced to Supabase `gym_data` table
 - **Recovery:** Load from DB on app boot (same as Diet Tracker)
@@ -775,7 +815,9 @@ const S = {
 ## ✨ FEATURE BREAKDOWN
 
 ### Phase 1: MVP (2-3 weeks)
+
 **Must-have for launch:**
+
 - ✅ User profile setup (name, weight, goal, experience)
 - ✅ Log today's workout (add exercises, sets, reps, weight)
 - ✅ View workout history (last 30 days)
@@ -787,6 +829,7 @@ const S = {
 - ✅ Supabase backend ready
 
 ### Phase 2: Analytics & Planning (1-2 weeks)
+
 - 📊 Strength curve graphs (weight progression over time)
 - 📈 Volume by muscle group breakdown
 - 🎯 Suggested next workouts (based on PPL/Upper-Lower/Full Body)
@@ -795,6 +838,7 @@ const S = {
 - 💬 Form tips (markdown notes per exercise)
 
 ### Phase 3: Community & Advanced (1-2 weeks)
+
 - 👥 Share workouts with community
 - ⭐ Popular workout templates
 - 🏆 Strength standards comparison
@@ -807,6 +851,7 @@ const S = {
 ## 🛠️ IMPLEMENTATION ROADMAP
 
 ### Step 1: Project Setup
+
 ```bash
 # Create repo
 git init gym-tracker
@@ -826,6 +871,7 @@ cp config.example.js config.js
 ```
 
 ### Step 2: Build HTML Structure
+
 - Setup viewport meta tags (mobile-first)
 - Create CSS token system (colors, spacing, animations)
 - Build bottom nav (8 screens)
@@ -833,6 +879,7 @@ cp config.example.js config.js
 - Add toast notification system
 
 ### Step 3: Implement JavaScript Modules (in order)
+
 1. **DB** - Supabase wrapper + offline queueing
 2. **CALC** - Volume, 1RM, strength standards
 3. **EXERCISES** - Exercise database (200+ exercises)
@@ -844,6 +891,7 @@ cp config.example.js config.js
 9. **PLANS** - Smart workout suggestions
 
 ### Step 4: Build Views (in order)
+
 1. **Settings** - Profile setup (required first)
 2. **Today** - Active workout logging
 3. **Workouts** - History & templates
@@ -854,6 +902,7 @@ cp config.example.js config.js
 8. **Community** - Shared workouts (if time)
 
 ### Step 5: Testing & Polish
+
 - Manual testing on mobile device
 - Check all views render correctly
 - Test offline mode
@@ -863,6 +912,7 @@ cp config.example.js config.js
 - Deploy to Cloudflare Pages
 
 ### Step 6: Documentation
+
 - README with setup instructions
 - Database schema documentation
 - API endpoint reference
@@ -874,6 +924,7 @@ cp config.example.js config.js
 ## 📱 RESPONSIVE DESIGN
 
 ### Breakpoints
+
 ```css
 /* Mobile First (default) */
 #view { max-width: 720px; margin: 0 auto; }
@@ -885,6 +936,7 @@ cp config.example.js config.js
 ```
 
 ### Safe Areas (iPhone notch support)
+
 ```css
 #nav { padding-bottom: env(safe-area-inset-bottom); }
 #header { padding-top: env(safe-area-inset-top); }
@@ -895,6 +947,7 @@ cp config.example.js config.js
 ## ⚠️ ERROR HANDLING
 
 ### All Operations Protected
+
 ```javascript
 // Every DB call wrapped
 try {
@@ -914,6 +967,7 @@ try {
 ```
 
 ### Input Validation
+
 ```javascript
 // All numeric inputs validated
 const reps = VALID.numeric(input, 1, 100, 'Reps');
@@ -922,6 +976,7 @@ const rpe = VALID.numeric(input, 1, 10, 'RPE');
 ```
 
 ### Error UI
+
 - User-friendly error messages (not technical errors)
 - Reload button on critical failures
 - Toast notifications for all operations
@@ -932,6 +987,7 @@ const rpe = VALID.numeric(input, 1, 10, 'RPE');
 ## 🎯 SUCCESS METRICS
 
 ### MVP Launch Checklist
+
 - [ ] Can create profile and set goals
 - [ ] Can log workout with multiple exercises
 - [ ] Can view personal records
@@ -944,6 +1000,7 @@ const rpe = VALID.numeric(input, 1, 10, 'RPE');
 - [ ] Cloudflare deployment working
 
 ### Post-Launch Metrics
+
 - Page load time < 2s
 - No memory leaks (check DevTools)
 - 0 uncaught errors
@@ -972,6 +1029,7 @@ const rpe = VALID.numeric(input, 1, 10, 'RPE');
 ## 🚀 FINAL NOTES
 
 ### Constraints to Follow (from Diet Tracker success)
+
 1. **Single file only** - All code in gym-tracker.html (no separate files)
 2. **No dependencies** - Vanilla JS only, no libraries
 3. **Mobile-first** - Optimized for gym use on phones
@@ -984,6 +1042,7 @@ const rpe = VALID.numeric(input, 1, 10, 'RPE');
 10. **Performant** - <2s load, 60fps animations, <5MB total
 
 ### Comparison: Diet Tracker → Gym Tracker
+
 | Aspect | Diet Tracker | Gym Tracker |
 |--------|-------------|-----------|
 | Focus | Nutrition | Workouts |
