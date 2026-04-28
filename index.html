@@ -325,7 +325,20 @@
 <div id="header">
   <button id="btn-back" class="btn-secondary hidden" onclick="goBack()">← Back</button>
   <div class="logo"><span>💪</span> Gym Tracker</div>
-  <button id="btn-settings" class="btn-secondary" onclick="openView('settings')">⚙️</button>
+  <div style="display: flex; gap: 6px; align-items: center;">
+    <!-- Language Toggle -->
+    <select id="lang-toggle" onchange="changeLanguage(this.value)" style="padding: 6px 8px; font-size: 12px; border-radius: 6px;">
+      <option value="en" selected>EN</option>
+      <option value="es">ES</option>
+    </select>
+    <!-- Theme Toggle -->
+    <select id="theme-toggle" onchange="changeTheme(this.value)" style="padding: 6px 8px; font-size: 12px; border-radius: 6px;">
+      <option value="dark" selected>🌙 Dark</option>
+      <option value="light">☀️ Light</option>
+      <option value="pink">💗 Pink</option>
+    </select>
+    <button id="btn-settings" class="btn-secondary" onclick="openView('settings')" style="padding: 6px 8px;">⚙️</button>
+  </div>
 </div>
 
 <div id="main"></div>
@@ -738,6 +751,19 @@ async function loadState() {
     const saved = await DB.get('profile');
     if (saved) state = { ...state, ...saved };
     VALID.profile(state.profile);
+    
+    // Apply saved theme
+    const savedTheme = state.preferences?.theme || 'dark';
+    document.body.className = `theme-${savedTheme}`;
+    if (document.getElementById('theme-toggle')) {
+      document.getElementById('theme-toggle').value = savedTheme;
+    }
+    
+    // Apply saved language
+    const savedLang = state.preferences?.language || 'en';
+    if (document.getElementById('lang-toggle')) {
+      document.getElementById('lang-toggle').value = savedLang;
+    }
   } catch (e) {
     console.error('Load error:', e);
     showToast('Failed to load data: ' + e.message, 'error');
@@ -773,6 +799,12 @@ function render() {
     else if (currentView === 'notes') main.innerHTML = renderNotes();
     else if (currentView === 'community') main.innerHTML = renderCommunity();
     else if (currentView === 'settings') main.innerHTML = renderSettings();
+    
+    // Sync header toggles with current state
+    const themeToggle = document.getElementById('theme-toggle');
+    const langToggle = document.getElementById('lang-toggle');
+    if (themeToggle) themeToggle.value = state.preferences?.theme || 'dark';
+    if (langToggle) langToggle.value = state.preferences?.language || 'en';
   } catch (e) {
     console.error('Render error:', e);
     main.innerHTML = `
@@ -1534,11 +1566,25 @@ function saveProfile() {
 function changeTheme(theme) {
   document.body.className = `theme-${theme}`;
   state.preferences.theme = theme;
+  
+  // Update the theme toggle dropdown
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.value = theme;
+  }
+  
   saveState();
 }
 
 function changeLanguage(lang) {
   state.preferences.language = lang;
+  
+  // Update the language toggle dropdown
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.value = lang;
+  }
+  
   saveState();
   render();
 }
