@@ -1750,7 +1750,19 @@ window.addEventListener('beforeunload', () => {
   try {
     // Check if Supabase credentials are loaded
     if (!window.__ENV?.SUPABASE_URL || !window.__ENV?.SUPABASE_KEY) {
-      showToast('❌ Supabase credentials not configured. Check Cloudflare environment variables.', 'error');\n      throw new Error('Missing Supabase credentials');\n    }\n    \n    await loadState();\n    updateNav();\n    render();\n    showToast('✓ Connected to Supabase');\n  } catch (e) {\n    console.error('Init error:', e);\n    showToast('Failed to initialize: ' + e.message, 'error');\n  }\n})();
+      showToast('❌ Supabase credentials not configured. Check Cloudflare environment variables.', 'error');
+      throw new Error('Missing Supabase credentials');
+    }
+    
+    await loadState();
+    updateNav();
+    render();
+    showToast('✓ Connected to Supabase');
+  } catch (e) {
+    console.error('Init error:', e);
+    showToast('Failed to initialize: ' + e.message, 'error');
+  }
+})();
 </script>
 
 </body>
