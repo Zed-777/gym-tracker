@@ -318,6 +318,161 @@
       margin-bottom: 12px;
       text-align: center;
     }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal {
+      background: linear-gradient(135deg, var(--bg2) 0%, var(--bg) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 90%;
+      width: 380px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      animation: slideUp 0.3s ease;
+    }
+
+    .rpe-modal {
+      text-align: center;
+    }
+
+    .celebration-modal {
+      text-align: center;
+    }
+
+    .celebration-emoji {
+      font-size: 80px;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: bounce 0.6s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .celebration-text {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .celebration-subtitle {
+      font-size: 14px;
+      color: var(--fg2);
+      margin-bottom: 20px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      min-width: 80px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ac);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--fg2);
+      text-transform: uppercase;
+    }
+
+    .rpe-display {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--ac);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .rpe-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 16px 0;
+    }
+
+    .rpe-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ac) 0%, var(--ac2) 100%);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+
+    .rpe-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ac) 0%, var(--ac2) 100%);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+
+    .rpe-description {
+      font-size: 14px;
+      color: var(--fg2);
+      margin: 16px 0;
+      min-height: 20px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body class="theme-dark">
@@ -337,7 +492,6 @@
   <button class="nav-btn" data-view="analytics" onclick="openView('analytics')">📊 Analytics</button>
   <button class="nav-btn" data-view="equipment" onclick="openView('equipment')">🛒 Equipment</button>
   <button class="nav-btn" data-view="notes" onclick="openView('notes')">📝 Notes</button>
-  <button class="nav-btn" data-view="community" onclick="openView('community')">💬 Community</button>
 </div>
 
 <div id="toast-container" class="toast-container"></div>
@@ -760,7 +914,6 @@ function render() {
     else if (currentView === 'analytics') main.innerHTML = renderAnalytics();
     else if (currentView === 'equipment') main.innerHTML = renderEquipment();
     else if (currentView === 'notes') main.innerHTML = renderNotes();
-    else if (currentView === 'community') main.innerHTML = renderCommunity();
     else if (currentView === 'settings') main.innerHTML = renderSettings();
   } catch (e) {
     console.error('Render error:', e);
@@ -806,10 +959,11 @@ function renderToday() {
       <div class="section-header">Exercises</div>
       ${workout.exercises?.length === 0 ? `<div style="text-align: center; color: var(--fg2); padding: 24px 0;">${T('add_first')}</div>` : ''}
       ${(workout.exercises || []).map((ex, idx) => `
-        <div class="exercise-card">
-          <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div class="exercise-card" style="opacity: ${ex.completed ? 0.7 : 1}; border-left-color: ${ex.completed ? 'var(--volume)' : 'var(--ac)'};  transition: all 0.2s ease;">
+          <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
+            <input type="checkbox" ${ex.completed ? 'checked' : ''} onchange="toggleExerciseComplete(${idx})" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--ac); margin-top: 2px; flex-shrink: 0;">
             <div style="flex: 1;">
-              <div class="exercise-name">${ex.name}</div>
+              <div class="exercise-name" style="text-decoration: ${ex.completed ? 'line-through' : 'none'}; color: ${ex.completed ? 'var(--fg2)' : 'var(--fg)'}}>${ex.name}</div>
               <div class="set-row">
                 ${(ex.sets || []).map(s => `
                   <div class="set-item">
@@ -820,7 +974,7 @@ function renderToday() {
                 `).join('')}
               </div>
             </div>
-            <button class="btn-secondary" onclick="deleteExercise(${idx})" style="padding: 6px 10px; font-size: 12px;">✕</button>
+            <button class="btn-secondary" onclick="deleteExercise(${idx})" style="padding: 6px 10px; font-size: 12px; flex-shrink: 0;">✕</button>
           </div>
         </div>
       `).join('')}
@@ -1229,63 +1383,6 @@ function renderNotes() {
     </div>
   `;
 }
-
-function renderCommunity() {
-  const popularWorkouts = [
-    { id: 1, name: 'Push/Pull/Legs Split', creator: 'Coach Mike', rating: 4.8, saves: 2340, exercises: ['Bench Press', 'Incline Press', 'Rows', 'Deadlift'] },
-    { id: 2, name: 'Upper/Lower Split', creator: 'Fitness Alex', rating: 4.7, saves: 1890, exercises: ['Bench Press', 'Pull-ups', 'Leg Press', 'Leg Curl'] },
-    { id: 3, name: 'Full Body 3x/week', creator: 'Coach Jay', rating: 4.9, saves: 3120, exercises: ['Squat', 'Bench Press', 'Rows', 'Dips'] },
-    { id: 4, name: 'Leg Day Destroyer', creator: 'Strength_Gains', rating: 4.6, saves: 1650, exercises: ['Back Squat', 'Leg Press', 'Leg Curl', 'Calf Raise'] },
-    { id: 5, name: 'Hypertrophy Focus', creator: 'Natty_Boy', rating: 4.5, saves: 1240, exercises: ['Dumbbell Press', 'Lat Pulldown', 'Leg Extension', 'Cable Flye'] }
-  ];
-
-  const formTips = [
-    { exercise: 'Squat', tip: 'Chest up, knees track over toes, depth matters more than load', author: 'Coach Jay' },
-    { exercise: 'Bench Press', tip: 'Keep shoulders back, full ROM, slight pause at chest', author: 'Strength_Coach' },
-    { exercise: 'Deadlift', tip: 'Hips high initially, neutral spine, bar stays close to body', author: 'Coach Mike' },
-    { exercise: 'Pull-ups', tip: 'Depress shoulders first, chest to bar, full stretch at bottom', author: 'Fitness_Expert' }
-  ];
-
-  const workoutsHtml = popularWorkouts.map(w => `
-    <div class="card" style="margin-bottom: 12px;">
-      <div style="display: flex; justify-content: space-between; align-items: start;">
-        <div style="flex: 1;">
-          <div style="font-weight: 600; margin-bottom: 4px;">💪 ${w.name}</div>
-          <div style="font-size: 12px; color: var(--fg2); margin-bottom: 8px;">by ${w.creator}</div>
-          <div style="font-size: 13px; margin-bottom: 8px;">${w.exercises.join(' • ')}</div>
-          <div style="font-size: 11px; color: var(--fg2);">⭐ ${w.rating} • 💾 ${w.saves}</div>
-        </div>
-        <button class="btn-primary" style="padding: 8px 12px; font-size: 12px;" onclick="cloneWorkout(${w.id})">Clone</button>
-      </div>
-    </div>
-  `).join('');
-
-  const tipsHtml = formTips.map(tip => `
-    <div class="card" style="margin-bottom: 12px;">
-      <div style="font-weight: 600; margin-bottom: 8px;">${tip.exercise}</div>
-      <div style="font-size: 13px; margin-bottom: 8px;">"${tip.tip}"</div>
-      <div style="font-size: 11px; color: var(--fg2);">— ${tip.author}</div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="fade-in">
-      <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">💬 Community</div>
-
-      <div class="section-header">Popular Workouts</div>
-      ${workoutsHtml}
-
-      <div class="section-header" style="margin-top: 20px;">Form Tips from the Community</div>
-      ${tipsHtml}
-
-      <div style="text-align: center; margin-top: 20px; padding: 16px; background: var(--bg2); border-radius: 8px;">
-        <div style="font-size: 13px; color: var(--fg2); margin-bottom: 8px;">Want to share your workout or tips?</div>
-        <button class="btn-secondary" style="width: 100%;">Submit Workout/Tip</button>
-      </div>
-    </div>
-  `;
-}
-
 function renderSettings() {
   return `
     <div class="fade-in">
@@ -1373,6 +1470,127 @@ function showAddExerciseForm() {
   } catch (e) {
     showToast(e.message, 'error');
   }
+}
+
+function toggleExerciseComplete(idx) {
+  const today = getToday();
+  if (!state.workouts[today] || !state.workouts[today].exercises[idx]) return;
+  state.workouts[today].exercises[idx].completed = !state.workouts[today].exercises[idx].completed;
+  
+  // If marking as complete, show RPE input modal
+  if (state.workouts[today].exercises[idx].completed) {
+    const exName = state.workouts[today].exercises[idx].name;
+    showRPEModal(idx, exName);
+    
+    // Check if all exercises are now complete
+    const totalEx = state.workouts[today].exercises.length;
+    const completedEx = state.workouts[today].exercises.filter(ex => ex.completed).length;
+    if (completedEx === totalEx) {
+      setTimeout(() => showCelebrationModal(), 500);
+    }
+  } else {
+    saveState();
+    render();
+  }
+}
+
+function showRPEModal(exerciseIdx, exerciseName) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal rpe-modal">
+      <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">How hard was it?</div>
+      <div style="font-size: 13px; color: var(--fg2); margin-bottom: 20px;">Rate your effort (RPE)</div>
+      
+      <div class="rpe-display" id="rpe-display">5</div>
+      <input type="range" id="rpe-slider" class="rpe-slider" min="1" max="10" value="5" oninput="document.getElementById('rpe-display').textContent = this.value;">
+      
+      <div class="rpe-description" id="rpe-description">Moderate effort - could do more</div>
+      
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove(); render();" style="background: var(--bg2); color: var(--fg);">Skip</button>
+        <button class="btn-primary" onclick="setRPEAndClose(${exerciseIdx});">✓ Done</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Update description as slider changes
+  const slider = document.getElementById('rpe-slider');
+  const descriptions = {
+    1: 'Very easy - warm-up',
+    2: 'Easy - felt good',
+    3: 'Easy - felt good',
+    4: 'Easy - felt good',
+    5: 'Moderate - some effort',
+    6: 'Moderate - some effort',
+    7: 'Hard - pushing it',
+    8: 'Very hard - almost max',
+    9: 'Almost maxed out',
+    10: 'Maximum effort - couldn\'t do another'
+  };
+  
+  slider.addEventListener('input', (e) => {
+    document.getElementById('rpe-description').textContent = descriptions[e.target.value];
+  });
+}
+
+function setRPEAndClose(exerciseIdx) {
+  const rpe = parseInt(document.getElementById('rpe-slider').value);
+  const today = getToday();
+  
+  if (state.workouts[today].exercises[exerciseIdx]) {
+    state.workouts[today].exercises[exerciseIdx].rpe = rpe;
+  }
+  
+  document.querySelector('.modal-overlay').remove();
+  saveState();
+  render();
+}
+
+function showCelebrationModal() {
+  const today = getToday();
+  const workout = state.workouts[today];
+  
+  const totalVolume = CALC.calculateVolume(workout.exercises?.flatMap(e => e.sets || []) || []);
+  const duration = workout.duration || '-';
+  const exCount = workout.exercises?.length || 0;
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal celebration-modal">
+      <div class="celebration-emoji">🎉</div>
+      <div class="celebration-text">Workout Crushed!</div>
+      <div class="celebration-subtitle">Amazing work today! You completed all your exercises.</div>
+      
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value">${exCount}</div>
+          <div class="stat-label">Exercises</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${totalVolume.toFixed(0)}</div>
+          <div class="stat-label">kg Volume</div>
+        </div>
+      </div>
+      
+      <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 1px solid rgba(16, 185, 129, 0.2); padding: 16px; border-radius: 10px; margin: 20px 0;">
+        <div style="font-size: 13px; color: var(--fg2); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">💪 Keep it up!</div>
+        <div style="font-size: 14px; color: var(--fg); line-height: 1.6;">You're building momentum. Rest well and come back stronger!</div>
+      </div>
+      
+      <button class="btn-primary" onclick="this.parentElement.parentElement.remove();" style="width: 100%; margin-top: 16px; padding: 14px; font-weight: 700; background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);">✓ Awesome!</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Click outside to close
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
 }
 
 function deleteExercise(idx) {
