@@ -379,7 +379,7 @@ const DB = {
   async get(id) {
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
     const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}&select=*`;
-    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${SB_KEY}` } });
+    const res = await fetch(url, { headers: { 'apikey': SB_KEY } });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     const rows = await res.json();
     return rows?.[0]?.data || null;
@@ -391,7 +391,7 @@ const DB = {
     await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SB_KEY}`,
+        'apikey': SB_KEY,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
@@ -402,7 +402,7 @@ const DB = {
   async delete(id) {
     if (!SB_URL || !SB_KEY) throw new Error('Database credentials not loaded');
     const url = `${SB_URL}/rest/v1/gym_data?id=eq.${encodeURIComponent(id)}`;
-    await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${SB_KEY}` } });
+    await fetch(url, { method: 'DELETE', headers: { 'apikey': SB_KEY } });
   }
 };
 

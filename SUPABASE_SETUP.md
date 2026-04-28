@@ -136,7 +136,7 @@ Open browser console (F12) and run:
   try {
     const url = `${window.__ENV.SUPABASE_URL}/rest/v1/gym_data?select=*`;
     const res = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${window.__ENV.SUPABASE_KEY}` }
+      headers: { 'apikey': window.__ENV.SUPABASE_KEY }
     });
     const data = await res.json();
     console.log('✅ Connection successful!', data);
