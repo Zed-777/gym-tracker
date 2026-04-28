@@ -1462,7 +1462,7 @@ function showAddExerciseForm() {
     
     state.workouts[today].exercises.push({
       name: exerciseName,
-      sets: Array(sets).fill(null).map(() => ({ reps: parseInt(reps), weight: parseFloat(weight), rpe: 6 }))
+      sets: Array(sets).fill(null).map(() => ({ reps: parseInt(reps), weight: parseFloat(weight), rpe: null }))
     });
 
     saveState();
@@ -1894,25 +1894,25 @@ function deleteNote(idx) {
 function cloneWorkout(workoutId) {
   const workouts = [
     { id: 1, name: 'Push/Pull/Legs Split', exercises: [
-      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100, rpe: 8 }, { reps: 5, weight: 100, rpe: 8 }] },
-      { name: 'Incline Barbell Press', sets: [{ reps: 6, weight: 85, rpe: 7 }] }
+      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100 }, { reps: 5, weight: 100 }] },
+      { name: 'Incline Barbell Press', sets: [{ reps: 6, weight: 85 }] }
     ]},
     { id: 2, name: 'Upper/Lower Split', exercises: [
-      { name: 'Barbell Bench Press', sets: [{ reps: 8, weight: 95, rpe: 7 }] },
-      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 80, rpe: 6 }] }
+      { name: 'Barbell Bench Press', sets: [{ reps: 8, weight: 95 }] },
+      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 80 }] }
     ]},
     { id: 3, name: 'Full Body 3x/week', exercises: [
-      { name: 'Back Squat', sets: [{ reps: 5, weight: 120, rpe: 8 }] },
-      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100, rpe: 8 }] },
-      { name: 'Barbell Row', sets: [{ reps: 5, weight: 105, rpe: 8 }] }
+      { name: 'Back Squat', sets: [{ reps: 5, weight: 120 }] },
+      { name: 'Barbell Bench Press', sets: [{ reps: 5, weight: 100 }] },
+      { name: 'Barbell Row', sets: [{ reps: 5, weight: 105 }] }
     ]},
     { id: 4, name: 'Leg Day Destroyer', exercises: [
-      { name: 'Back Squat', sets: [{ reps: 6, weight: 115, rpe: 8 }] },
-      { name: 'Leg Press', sets: [{ reps: 8, weight: 250, rpe: 7 }] }
+      { name: 'Back Squat', sets: [{ reps: 6, weight: 115 }] },
+      { name: 'Leg Press', sets: [{ reps: 8, weight: 250 }] }
     ]},
     { id: 5, name: 'Hypertrophy Focus', exercises: [
-      { name: 'Dumbbell Bench Press', sets: [{ reps: 8, weight: 45, rpe: 7 }] },
-      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 75, rpe: 6 }] }
+      { name: 'Dumbbell Bench Press', sets: [{ reps: 8, weight: 45 }] },
+      { name: 'Lat Pulldown', sets: [{ reps: 8, weight: 75 }] }
     ]}
   ];
   
