@@ -1147,6 +1147,7 @@ function renderAnalytics() {
   // Calculate total volume and intensity
   let totalVolume = 0;
   let totalIntensity = 0;
+  let totalExercisesWithRPE = 0;
   let totalSets = 0;
   const muscleGroupVolume = {};
 
@@ -1155,35 +1156,40 @@ function renderAnalytics() {
     (workout.exercises || []).forEach(exercise => {
       (exercise.sets || []).forEach(set => {
         totalVolume += (set.reps || 0) * (set.weight || 0);
-        totalIntensity += set.rpe || 0;
         totalSets++;
-        
-        // Track by muscle groups
-        const exerciseId = exercise.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        const ex = EXERCISES.find(e => e.id === exerciseId) || 
-                   EXERCISES.find(e => e.name === exercise.name);
-        
-        if (ex && ex.muscleGroups) {
-          ex.muscleGroups.forEach(mg => {
-            muscleGroupVolume[mg] = (muscleGroupVolume[mg] || 0) + (set.reps * set.weight);
-          });
-        }
       });
+      
+      // Add exercise-level RPE (once per exercise, not per set)
+      if (exercise.rpe !== null && exercise.rpe !== undefined) {
+        totalIntensity += exercise.rpe;
+        totalExercisesWithRPE++;
+      }
+      
+      // Track by muscle groups
+      const exerciseId = exercise.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      const ex = EXERCISES.find(e => e.id === exerciseId) || 
+                 EXERCISES.find(e => e.name === exercise.name);
+      
+      if (ex && ex.muscleGroups) {
+        ex.muscleGroups.forEach(mg => {
+          muscleGroupVolume[mg] = (muscleGroupVolume[mg] || 0) + ((exercise.sets || []).reduce((sum, s) => sum + (s.reps || 0) * (s.weight || 0), 0));
+        });
+      }
     });
   });
 
-  const avgIntensity = totalSets > 0 ? (totalIntensity / totalSets).toFixed(1) : 0;
+  const avgIntensity = totalExercisesWithRPE > 0 ? (totalIntensity / totalExercisesWithRPE).toFixed(1) : 0;
 
   // RPE distribution
   const rpeDistribution = { easy: 0, moderate: 0, hard: 0 };
   Object.values(state.workouts || {}).forEach(workout => {
     (workout.exercises || []).forEach(exercise => {
-      (exercise.sets || []).forEach(set => {
-        const rpe = set.rpe || 5;
+      const rpe = (exercise.rpe !== null && exercise.rpe !== undefined) ? exercise.rpe : null;
+      if (rpe !== null) {
         if (rpe <= 5) rpeDistribution.easy++;
         else if (rpe <= 7) rpeDistribution.moderate++;
         else rpeDistribution.hard++;
-      });
+      }
     });
   });
 
@@ -1513,7 +1519,7 @@ function showRPEModal(exerciseIdx, exerciseName) {
   Object.entries(state.workouts || {}).forEach(([date, workout]) => {
     if (date === getToday()) return; // Skip current workout
     (workout.exercises || []).forEach(ex => {
-      if (ex.name === exerciseName && ex.rpe) {
+      if (ex.name === exerciseName && ex.rpe !== null && ex.rpe !== undefined) {
         historicalRPEs.push(ex.rpe);
       }
     });
